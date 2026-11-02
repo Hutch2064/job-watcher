@@ -1,6 +1,7 @@
 """Collect public ATS JSON, then deterministically rebuild posting history."""
 import argparse
 import csv
+from concurrent.futures import ThreadPoolExecutor
 import gzip
 import json
 import re
@@ -88,7 +89,7 @@ def build():
 
 def collect():
     now = datetime.now(timezone.utc); date = now.date().isoformat(); folder = ROOT/'data/raw'/date; folder.mkdir(parents=True, exist_ok=True); results=[]
-    for s in SOURCES:
+    def collect_one(s):
         path = folder/(s['id']+'.json.gz')
         try:
             data = fetch(s); rows = normalize(s, data)
@@ -96,9 +97,11 @@ def collect():
             temp = path.with_suffix('.tmp')
             with temp.open('wb') as raw:
                 with gzip.GzipFile(fileobj=raw, mode='wb', mtime=0) as out: out.write(json.dumps(data, ensure_ascii=False, separators=(',',':')).encode())
-            temp.replace(path); results.append({'name':s['name'], 'ok':True, 'count':len(rows)}); print(s['name'],len(rows), flush=True)
+            temp.replace(path); print(s['name'],len(rows), flush=True); return {'name':s['name'], 'ok':True, 'count':len(rows)}
         except Exception as exc:
-            path.unlink(missing_ok=True); results.append({'name':s['name'], 'ok':False, 'count':0, 'error':str(exc)}); print(s['name'], 'FAILED', exc, file=sys.stderr, flush=True)
+            path.unlink(missing_ok=True); print(s['name'], 'FAILED', exc, file=sys.stderr, flush=True); return {'name':s['name'], 'ok':False, 'count':0, 'error':str(exc)}
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        results = list(pool.map(collect_one, SOURCES))
     history, dates = build(); rows = list(history.values())
     status = {'run_time':now.isoformat().replace('+00:00','Z'), 'first_run_date':min(dates) if dates else '', 'days_with_success':len(dates), 'open':sum(r['status']=='open' for r in rows), 'new_today':sum(r['first_seen']==date and r['first_run']=='false' for r in rows), 'removed_today':sum(r['removed_date']==date for r in rows), 'sources':results}
     (ROOT/'data/status.json').write_text(json.dumps(status, indent=2)+'\n')
