@@ -1,30 +1,30 @@
 {
-  "run_time": "2026-11-02T05:00:54.214601Z",
+  "run_time": "2026-11-02T21:46:06.562240Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 1,
-  "open": 5043,
+  "open": 4481,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
     {
       "name": "BlackRock",
       "ok": true,
-      "count": 240
+      "count": 244
     },
     {
       "name": "Invesco",
       "ok": true,
-      "count": 206
+      "count": 204
     },
     {
       "name": "Fidelity",
       "ok": true,
-      "count": 803
+      "count": 824
     },
     {
       "name": "Dimensional",
       "ok": true,
-      "count": 73
+      "count": 74
     },
     {
       "name": "T. Rowe Price",
@@ -34,12 +34,12 @@
     {
       "name": "State Street",
       "ok": true,
-      "count": 1069
+      "count": 1118
     },
     {
       "name": "Vanguard",
       "ok": true,
-      "count": 330
+      "count": 333
     },
     {
       "name": "Apollo",
@@ -54,7 +54,7 @@
     {
       "name": "Point72",
       "ok": true,
-      "count": 205
+      "count": 198
     },
     {
       "name": "Bridgewater Associates",
@@ -74,7 +74,7 @@
     {
       "name": "Jane Street",
       "ok": true,
-      "count": 218
+      "count": 217
     },
     {
       "name": "Betterment",
@@ -84,47 +84,48 @@
     {
       "name": "Man Group",
       "ok": true,
-      "count": 68
+      "count": 66
     },
     {
       "name": "AQR",
       "ok": true,
-      "count": 55
+      "count": 54
     },
     {
       "name": "WisdomTree UK",
       "ok": true,
-      "count": 8
+      "count": 7
     },
     {
       "name": "Thrivent",
       "ok": true,
-      "count": 315
+      "count": 309
     },
     {
       "name": "Neuberger Berman",
       "ok": true,
-      "count": 93
+      "count": 94
     },
     {
       "name": "AllianceBernstein",
       "ok": true,
-      "count": 91
+      "count": 86
     },
     {
       "name": "Hartford",
       "ok": true,
-      "count": 239
+      "count": 234
     },
     {
       "name": "Northern Trust",
-      "ok": true,
-      "count": 617
+      "ok": false,
+      "count": 0,
+      "error": "'title'"
     },
     {
       "name": "TIAA / Nuveen",
       "ok": true,
-      "count": 145
+      "count": 151
     },
     {
       "name": "GMO",
