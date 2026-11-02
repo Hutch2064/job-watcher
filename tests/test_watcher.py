@@ -31,3 +31,27 @@ def test_history_removals_failures_and_reappearance(tmp_path, monkeypatch):
     assert h['g:2']['first_run']=='false' and h['g:2']['removed_date']=='2026-01-04' and h['g:2']['last_seen']=='2026-01-03'
     assert h['h:3']['status']=='open' and len(days)==4
     first=(tmp_path/'data/history.csv').read_bytes(); watcher.build(); assert (tmp_path/'data/history.csv').read_bytes()==first
+
+def test_experience_classification():
+    classify = watcher.experience_level
+    assert classify('Senior Portfolio Analyst', 'No experience required')[0] == 'experienced'
+    assert classify('Vice President, Investment Research', '')[0] == 'experienced'
+    assert classify('Portfolio Analyst, AVP', '')[0] == 'experienced'
+    assert classify('Lead Portfolio Analyst', '')[0] == 'experienced'
+    assert classify('Portfolio Analyst', '<p>1-3 years of relevant investment experience</p>')[0] == 'early'
+    assert classify('Investment Analyst', '<li>Minimum of 3+ years of relevant experience</li>')[0] == 'experienced'
+    assert classify('Investment Analyst', '<li>Two years of experience required</li>')[0] == 'early'
+    assert classify('Investment Analyst', '<li>Five years of experience preferred</li>')[0] == 'unknown'
+    assert classify('Investment Analyst', 'We have served clients for 30 years.')[0] == 'unknown'
+    assert classify('Investment Analyst', 'Experienced candidate with 6 - 8-year post-graduation experience.')[0] == 'experienced'
+    assert classify('Investment Analyst', '<p>Experience. 8 years in investment management; 4+ years specializing in active credit.</p>')[0] == 'experienced'
+    assert classify('Associate Portfolio Manager', '')[0] == 'unknown'
+    assert classify('Portfolio Analyst', '1-2 years of experience required. Minimum 5 years of investment experience required.')[0] == 'experienced'
+
+def test_workday_description_is_reproducible_from_raw():
+    source={'id':'w','name':'W','type':'workday','host':'test.wd1','board':'External'}
+    job={'title':'Investment Analyst','externalPath':'/job/City/role_R-1','locationsText':'City'}
+    raw={'pages':[{'jobPostings':[job]}], 'details':{job['externalPath']:'<p>3-5 years of investment experience required.</p>'}}
+    assert watcher.normalize(source,raw)[0]['experience']=='experienced'
+    del raw['details']
+    assert watcher.normalize(source,raw)[0]['experience']=='unknown'

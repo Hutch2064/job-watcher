@@ -1,8 +1,8 @@
 {
-  "run_time": "2026-11-02T04:40:09.070666Z",
+  "run_time": "2026-11-02T04:57:23.628088Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 1,
-  "open": 5054,
+  "open": 5055,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
@@ -119,7 +119,7 @@
     {
       "name": "Northern Trust",
       "ok": true,
-      "count": 615
+      "count": 616
     },
     {
       "name": "TIAA / Nuveen",

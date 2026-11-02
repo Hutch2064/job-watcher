@@ -3,6 +3,8 @@ import argparse
 import csv
 from concurrent.futures import ThreadPoolExecutor
 import gzip
+from html import unescape
+from html.parser import HTMLParser
 import json
 import re
 import sys
@@ -12,12 +14,50 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = json.loads((ROOT / 'sources.json').read_text())
-FIELDS = 'posting_id source source_id employer title location department posted_date url in_role first_run first_seen last_seen status removed_date'.split()
+FIELDS = 'posting_id source source_id employer title location department posted_date url in_role first_run first_seen last_seen status removed_date experience experience_reason'.split()
 ROLE = re.compile(r'\b(portfolio|asset allocation|investment|investing|equity research|fixed.income|credit research|credit analyst|equity analyst|quantitative research|quantitative analyst|fund research|manager research|etf|wealth (?:management|advisor)|financial planning|investment consulting|ocio|multi.asset|systematic|risk analytics|research analyst)\b', re.I)
 EXCLUDE = re.compile(r'\b(sales|marketing|accounting|accountant|reconciliation|administrative assistant|recruiter|tax|auditor|software engineer|cybersecurity|compliance|legal counsel)\b', re.I)
 
 def in_role(title):
     return bool(ROLE.search(title) and not EXCLUDE.search(title))
+
+class DescriptionText(HTMLParser):
+    def __init__(self):
+        super().__init__(); self.parts = []
+    def handle_starttag(self, tag, attrs):
+        if tag in ('p', 'li', 'br', 'div', 'h1', 'h2', 'h3', 'h4'): self.parts.append('\n')
+    def handle_endtag(self, tag):
+        if tag in ('p', 'li', 'div', 'h1', 'h2', 'h3', 'h4'): self.parts.append('\n')
+    def handle_data(self, data): self.parts.append(data)
+
+def plain_text(value):
+    parser = DescriptionText(); parser.feed(unescape(value or '')); return unescape(''.join(parser.parts))
+
+SENIOR = re.compile(r'\b(senior|sr\.?|staff|lead|principal|director|vice president|avp|vp|svp|evp|head of|chief|partner|managing director)\b', re.I)
+YEARS = re.compile(r'\b(?P<min>\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*(?:(?:-|–|—|to)\s*(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten))?\s*(?:\+|or more)?[\s-]*(?:years?|yrs?)\b', re.I)
+NUMBERS = {'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10}
+
+def experience_level(title, description=''):
+    if SENIOR.search(title): return ('experienced', 'Senior-level title')
+    observations = []
+    for line in plain_text(description).splitlines():
+        line = re.sub(r'\b(experience)\.\s+(?=\d)', r'\1: ', line, flags=re.I)
+        for sentence in re.split(r'(?<=[.!?])\s+', line):
+            for match in YEARS.finditer(sentence):
+                context = sentence[max(0, match.start()-90):match.end()+110]
+                if not re.search(r'\b(experience|experienced|work history)\b', context, re.I): continue
+                # Preferred credentials are useful context but are not minimum requirements.
+                preference_context = sentence[max(0, match.start()-35):match.end()+45]
+                if re.search(r'\b(preferred|a plus|nice to have|desired|desirable)\b', preference_context, re.I) and not re.search(r'\b(required|minimum|at least|must have)\b', preference_context, re.I): continue
+                token = match.group('min').lower()
+                minimum = int(token) if token.isdigit() else NUMBERS[token]
+                if minimum > 40: continue
+                observations.append((minimum, ' '.join(match.group(0).split())))
+    if observations:
+        minimum, phrase = max(observations, key=lambda x:x[0])
+        if minimum >= 3: return ('experienced', f'{phrase} of experience mentioned')
+        return ('early', f'{phrase} of experience mentioned')
+    return ('unknown', 'Experience not determined')
 
 def request(url, payload=None):
     data = json.dumps(payload).encode() if payload is not None else None
@@ -47,7 +87,18 @@ def fetch(source):
         if (page['total'] not in (0, total)) or (offset < total and not page['jobPostings']): raise ValueError('Incomplete or changing pagination')
         pages.append(page); offset += len(page['jobPostings'])
         if total == 0: break
-    return {'pages':pages}
+    # Detail lookups enrich relevant roles without jeopardizing the complete board snapshot.
+    postings = [j for page in pages for j in page['jobPostings'] if in_role(j['title']) and not SENIOR.search(j['title'])]
+    def detail(job):
+        try:
+            url = f"https://{source['host']}.myworkdayjobs.com/wday/cxs/{source['host'].split('.')[0]}/{board}{job['externalPath']}"
+            info = request(url).get('jobPostingInfo', {})
+            return job['externalPath'], info.get('jobDescription', '')
+        except Exception:
+            return job['externalPath'], ''
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        details = dict(pool.map(detail, postings))
+    return {'pages':pages, 'details':details}
 
 def normalize(source, data):
     kind = source['type']; rows = []
@@ -62,7 +113,12 @@ def normalize(source, data):
         else:
             path = j['externalPath']; sid = path.rsplit('_',1)[-1]; loc = j.get('locationsText',''); dep = ''; posted = ''; url = f"https://{source['host']}.myworkdayjobs.com/en-US/{source['board']}{path}"
         title = j['text'] if kind == 'lever' else j['title']
-        rows.append(dict(posting_id=source['id']+':'+sid, source=source['id'], source_id=sid, employer=source['name'], title=title, location=loc or '', department=dep or '', posted_date=posted, url=url, in_role=str(in_role(title)).lower()))
+        if kind == 'greenhouse': description = j.get('content', '')
+        elif kind == 'lever':
+            description = ' '.join([j.get('descriptionPlain') or j.get('description') or '', j.get('additionalPlain') or j.get('additional') or ''] + [x.get('text', '') + ' ' + (x.get('content') or '') for x in j.get('lists', [])])
+        else: description = data.get('details', {}).get(j['externalPath'], '')
+        level, reason = experience_level(title, description)
+        rows.append(dict(experience=level, experience_reason=reason, posting_id=source['id']+':'+sid, source=source['id'], source_id=sid, employer=source['name'], title=title, location=loc or '', department=dep or '', posted_date=posted, url=url, in_role=str(in_role(title)).lower()))
     if len({r['posting_id'] for r in rows}) != len(rows): raise ValueError('Duplicate source IDs')
     return rows
 
