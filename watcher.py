@@ -19,8 +19,14 @@ FIELDS = 'posting_id source source_id employer title location department posted_
 ROLE = re.compile(r'\b(portfolio|asset allocation|investment|investing|equity research|fixed.income|credit research|credit analyst|equity analyst|quantitative research|quantitative analyst|fund research|manager research|etf|wealth (?:management|advisor)|financial planning|investment consulting|ocio|multi.asset|systematic|risk analytics|research analyst)\b', re.I)
 EXCLUDE = re.compile(r'\b(sales|marketing|accounting|accountant|reconciliation|administrative assistant|recruiter|tax|auditor|software engineer|cybersecurity|compliance|legal counsel)\b', re.I)
 
+# Accept joined titles such as InvestmentIntern without matching Internal or International.
+INTERNSHIP = re.compile(r'intern(?!al|ation|et)(?:ship|s)?', re.I)
+PROGRAM = re.compile(r'program(?!m(?:ing|er)|matic)', re.I)
+SUMMER = re.compile(r'summer', re.I)
+
 def in_role(title):
-    return bool(ROLE.search(title) and not EXCLUDE.search(title))
+    normalized = INTERNSHIP.sub(lambda m: ' ' + m.group() + ' ', title)
+    return bool(ROLE.search(normalized) and not EXCLUDE.search(normalized))
 
 class DescriptionText(HTMLParser):
     def __init__(self):
@@ -39,6 +45,7 @@ YEARS = re.compile(r'\b(?P<min>\d{1,2}|zero|one|two|three|four|five|six|seven|ei
 NUMBERS = {'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10}
 
 def experience_level(title, description=''):
+    if INTERNSHIP.search(title): return ('early', 'Internship in title')
     if SENIOR.search(title): return ('experienced', 'Senior-level title')
     observations = []
     for line in plain_text(description).splitlines():
@@ -58,6 +65,8 @@ def experience_level(title, description=''):
         minimum, phrase = max(observations, key=lambda x:x[0])
         if minimum >= 3: return ('experienced', f'{phrase} of experience mentioned')
         return ('early', f'{phrase} of experience mentioned')
+    if SUMMER.search(title): return ('early', 'Summer in title')
+    if PROGRAM.search(title): return ('early', 'Program in title')
     return ('unknown', 'Experience not determined')
 
 def request(url, payload=None):

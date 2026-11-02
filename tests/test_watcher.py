@@ -66,3 +66,16 @@ def test_retry_incomplete_source(monkeypatch):
     monkeypatch.setattr(watcher.time,'sleep',lambda _:None)
     data, rows = watcher.fetch_validated({'id':'g','name':'G','type':'greenhouse'})
     assert len(calls)==3 and rows==[] and data=={'jobs':[]}
+
+def test_early_career_title_signals():
+    for title in ['Investment Intern', 'Investment Internship', 'SummerIntern', 'investmentinternship', 'Senior Investment Intern']:
+        assert watcher.experience_level(title, '') == ('early', 'Internship in title')
+    assert watcher.in_role('InvestmentIntern')
+    assert watcher.in_role('PortfolioInternship')
+    for title in ['International Investment Analyst', 'Internal Investment Analyst', 'Internet Investment Analyst']:
+        assert watcher.experience_level(title, '')[0] == 'unknown'
+    for title in ['Investment Summer Analyst', 'Investment Graduate Program']:
+        assert watcher.experience_level(title, '')[0] == 'early'
+    assert watcher.experience_level('Investment Programming Analyst', '')[0] == 'unknown'
+    assert watcher.experience_level('Senior Investment Program Manager', '')[0] == 'experienced'
+    assert watcher.experience_level('Investment Summer Program', '5 years of experience required')[0] == 'experienced'
