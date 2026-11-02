@@ -79,3 +79,9 @@ def test_early_career_title_signals():
     assert watcher.experience_level('Investment Programming Analyst', '')[0] == 'unknown'
     assert watcher.experience_level('Senior Investment Program Manager', '')[0] == 'experienced'
     assert watcher.experience_level('Investment Summer Program', '5 years of experience required')[0] == 'experienced'
+
+def test_reported_internships_are_early_not_international():
+    for title in ['2027 Investment Associate Intern', '2027 Quantitative Masters Internship Program - Investments - Portfolio Management - Atlanta', 'InvestmentInternship', 'summerINTERN']:
+        assert watcher.experience_level(title) == ('early', 'Internship in title')
+    for title in ['International Investment Analyst', 'Internal Investment Analyst']:
+        assert watcher.experience_level(title)[0] != 'early'
