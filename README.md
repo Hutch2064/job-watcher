@@ -21,6 +21,11 @@ A daily job watcher for investment research, portfolio construction, allocation,
 | Millennium | Workday |
 | Thrivent | Workday |
 | Neuberger Berman | Workday |
+| AllianceBernstein | Workday |
+| Hartford | Workday |
+| Northern Trust | Workday |
+| TIAA / Nuveen | Workday |
+| GMO | Lever |
 | Point72 | Greenhouse |
 | Bridgewater Associates | Greenhouse |
 | Connor, Clark & Lunn | Greenhouse |
@@ -31,7 +36,7 @@ A daily job watcher for investment research, portfolio construction, allocation,
 | AQR | Greenhouse |
 | WisdomTree UK | Lever |
 
-The user's requested brands and other candidates were considered as a starting list. Those without an accessible, verified JSON board are not represented as watched. This is a practical coverage limit, not a conclusion that they have no openings; employer recruiting sites and access policies change. Some brands share a parent employer's board and cannot be isolated reliably from its other postings. No HTML scraping is used.
+See [SOURCE_REVIEW.md](SOURCE_REVIEW.md) for requested brands mapped to the watchlist, investigated sources, and names still requiring individual verification. Those without an accessible, verified JSON board are not represented as watched. This is a practical coverage limit, not a conclusion that they have no openings; employer recruiting sites and access policies change. Some brands share a parent employer's board and cannot be isolated reliably from its other postings. No HTML scraping is used.
 
 ## How the pipeline works
 
@@ -50,7 +55,7 @@ The pipeline uses Python's standard library; pytest is the only test dependency.
 
 ### Title rule
 
-Case-insensitive title matches include portfolio, asset allocation, investment/investing, equity research, fixed income, credit research, quantitative research or analyst, fund or manager research, ETF, wealth management/advisor, financial planning, investment consulting, OCIO, multi-asset, systematic, risk analytics, or research analyst. Titles containing sales, marketing, accounting/accountant, reconciliation, administrative assistant, recruiter, tax, auditor, software engineer, cybersecurity, compliance, or legal counsel are excluded. This deliberately broad title-only rule can miss relevant jobs or admit unrelated ones; inspect the actual role. All postings are retained regardless of the rule.
+Case-insensitive title matches include portfolio, asset allocation, investment/investing, equity research, fixed income, credit research or analyst, equity analyst, quantitative research or analyst, fund or manager research, ETF, wealth management/advisor, financial planning, investment consulting, OCIO, multi-asset, systematic, risk analytics, or research analyst. Titles containing sales, marketing, accounting/accountant, reconciliation, administrative assistant, recruiter, tax, auditor, software engineer, cybersecurity, compliance, or legal counsel are excluded. This deliberately broad title-only rule can miss relevant jobs or admit unrelated ones; inspect the actual role. All postings are retained regardless of the rule.
 
 ## Repository map
 
@@ -69,4 +74,4 @@ Case-insensitive title matches include portfolio, asset allocation, investment/i
 | `.github/workflows/test.yml` | Tests on every push and pull request. |
 | `.github/workflows/daily.yml` | Scheduled/manual collector, issue and data commit. |
 | `.github/workflows/pages.yml` | GitHub Pages deployment. |
-| `.gitignore`, `README.md`, `SUBMISSION.txt` | Local exclusions, documentation and four-line submission. |
+| `.gitignore`, `README.md`, `SOURCE_REVIEW.md`, `SUBMISSION.txt` | Local exclusions, documentation, source review and four-line submission. |

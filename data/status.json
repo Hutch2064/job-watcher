@@ -1,8 +1,8 @@
 {
-  "run_time": "2026-11-02T04:36:57.292469Z",
+  "run_time": "2026-11-02T04:37:53.982081Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 1,
-  "open": 3945,
+  "open": 5050,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
@@ -105,6 +105,31 @@
       "name": "Neuberger Berman",
       "ok": true,
       "count": 93
+    },
+    {
+      "name": "AllianceBernstein",
+      "ok": true,
+      "count": 91
+    },
+    {
+      "name": "Hartford",
+      "ok": true,
+      "count": 241
+    },
+    {
+      "name": "Northern Trust",
+      "ok": true,
+      "count": 615
+    },
+    {
+      "name": "TIAA / Nuveen",
+      "ok": true,
+      "count": 149
+    },
+    {
+      "name": "GMO",
+      "ok": true,
+      "count": 9
     }
   ]
 }

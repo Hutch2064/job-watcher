@@ -129,5 +129,39 @@
     "type": "workday",
     "host": "nb.wd1",
     "board": "nbcareers"
+  },
+  {
+    "name": "AllianceBernstein",
+    "id": "alliancebernstein",
+    "type": "workday",
+    "host": "abglobal.wd1",
+    "board": "alliancebernsteincareers"
+  },
+  {
+    "name": "Hartford",
+    "id": "hartford",
+    "type": "workday",
+    "host": "thehartford.wd5",
+    "board": "Careers_External"
+  },
+  {
+    "name": "Northern Trust",
+    "id": "northerntrust",
+    "type": "workday",
+    "host": "ntrs.wd1",
+    "board": "northerntrust"
+  },
+  {
+    "name": "TIAA / Nuveen",
+    "id": "tiaa",
+    "type": "workday",
+    "host": "tiaa.wd1",
+    "board": "Search"
+  },
+  {
+    "name": "GMO",
+    "id": "gmo",
+    "type": "lever",
+    "board": "gmo"
   }
 ]
