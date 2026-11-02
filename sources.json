@@ -1,0 +1,20 @@
+[
+ {"name":"BlackRock","id":"blackrock","type":"workday","host":"blackrock.wd1","board":"BlackRock_Professional"},
+ {"name":"Invesco","id":"invesco","type":"workday","host":"invesco.wd1","board":"IVZ"},
+ {"name":"Fidelity","id":"fidelity","type":"workday","host":"fmr.wd1","board":"FidelityCareers"},
+ {"name":"Dimensional","id":"dimensional","type":"workday","host":"dimensional.wd5","board":"DFA_Careers"},
+ {"name":"T. Rowe Price","id":"troweprice","type":"workday","host":"troweprice.wd5","board":"TRowePrice"},
+ {"name":"State Street","id":"statestreet","type":"workday","host":"statestreet.wd1","board":"Global"},
+ {"name":"Vanguard","id":"vanguard","type":"workday","host":"vanguard.wd5","board":"vanguard_external"},
+ {"name":"Apollo","id":"apollo","type":"workday","host":"athene.wd5","board":"Apollo_Careers"},
+ {"name":"Millennium","id":"millennium","type":"workday","host":"mlp.wd5","board":"mlpcareers"},
+ {"name":"Point72","id":"point72","type":"greenhouse","board":"point72"},
+ {"name":"Bridgewater Associates","id":"bridgewater","type":"greenhouse","board":"bridgewater89"},
+ {"name":"Connor, Clark & Lunn","id":"cclim","type":"greenhouse","board":"cclim"},
+ {"name":"TPG","id":"tpg","type":"greenhouse","board":"tpgcareers"},
+ {"name":"Jane Street","id":"janestreet","type":"greenhouse","board":"janestreet"},
+ {"name":"Betterment","id":"betterment","type":"greenhouse","board":"betterment"},
+ {"name":"Man Group","id":"mangroup","type":"greenhouse","board":"mangroup"},
+ {"name":"AQR","id":"aqr","type":"greenhouse","board":"aqr"},
+ {"name":"WisdomTree UK","id":"wisdomtreeuk","type":"lever","board":"wisdomtree-2"}
+]
