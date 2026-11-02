@@ -26,6 +26,8 @@ A daily job watcher for investment research, portfolio construction, allocation,
 | Northern Trust | Workday |
 | TIAA / Nuveen | Workday |
 | GMO | Lever |
+| Harris / Oakmark | Greenhouse |
+| Avantis Investors | Workday |
 | Point72 | Greenhouse |
 | Bridgewater Associates | Greenhouse |
 | Connor, Clark & Lunn | Greenhouse |

@@ -1,8 +1,8 @@
 {
-  "run_time": "2026-11-02T04:39:19.954911Z",
+  "run_time": "2026-11-02T04:40:09.070666Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 1,
-  "open": 5050,
+  "open": 5054,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
@@ -130,6 +130,16 @@
       "name": "GMO",
       "ok": true,
       "count": 9
+    },
+    {
+      "name": "Harris | Oakmark",
+      "ok": true,
+      "count": 2
+    },
+    {
+      "name": "Avantis Investors",
+      "ok": true,
+      "count": 2
     }
   ]
 }

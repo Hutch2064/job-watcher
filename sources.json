@@ -163,5 +163,18 @@
     "id": "gmo",
     "type": "lever",
     "board": "gmo"
+  },
+  {
+    "name": "Harris | Oakmark",
+    "id": "oakmark",
+    "type": "greenhouse",
+    "board": "harrisprivatejobboard"
+  },
+  {
+    "name": "Avantis Investors",
+    "id": "avantis",
+    "type": "workday",
+    "host": "americancentury.wd5",
+    "board": "avantiscareers"
   }
 ]
