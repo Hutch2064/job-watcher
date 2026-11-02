@@ -1,15 +1,15 @@
 {
-  "run_time": "2026-11-02T04:59:42.731277Z",
+  "run_time": "2026-11-02T05:00:54.214601Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 1,
-  "open": 3027,
+  "open": 5043,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
     {
       "name": "BlackRock",
       "ok": true,
-      "count": 239
+      "count": 240
     },
     {
       "name": "Invesco",
@@ -18,9 +18,8 @@
     },
     {
       "name": "Fidelity",
-      "ok": false,
-      "count": 0,
-      "error": "Incomplete or changing pagination"
+      "ok": true,
+      "count": 803
     },
     {
       "name": "Dimensional",
@@ -34,14 +33,13 @@
     },
     {
       "name": "State Street",
-      "ok": false,
-      "count": 0,
-      "error": "Incomplete or changing pagination"
+      "ok": true,
+      "count": 1069
     },
     {
       "name": "Vanguard",
       "ok": true,
-      "count": 332
+      "count": 330
     },
     {
       "name": "Apollo",
@@ -125,9 +123,8 @@
     },
     {
       "name": "TIAA / Nuveen",
-      "ok": false,
-      "count": 0,
-      "error": "Duplicate source IDs"
+      "ok": true,
+      "count": 145
     },
     {
       "name": "GMO",

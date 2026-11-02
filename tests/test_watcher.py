@@ -55,3 +55,14 @@ def test_workday_description_is_reproducible_from_raw():
     assert watcher.normalize(source,raw)[0]['experience']=='experienced'
     del raw['details']
     assert watcher.normalize(source,raw)[0]['experience']=='unknown'
+
+def test_retry_incomplete_source(monkeypatch):
+    calls=[]
+    def fetch(source):
+        calls.append(1)
+        if len(calls)<3: raise ValueError('Incomplete pagination')
+        return {'jobs':[]}
+    monkeypatch.setattr(watcher,'fetch',fetch)
+    monkeypatch.setattr(watcher.time,'sleep',lambda _:None)
+    data, rows = watcher.fetch_validated({'id':'g','name':'G','type':'greenhouse'})
+    assert len(calls)==3 and rows==[] and data=={'jobs':[]}

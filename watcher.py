@@ -8,6 +8,7 @@ from html.parser import HTMLParser
 import json
 import re
 import sys
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -143,12 +144,21 @@ def build():
         writer = csv.DictWriter(f, fieldnames=FIELDS, lineterminator='\n'); writer.writeheader(); writer.writerows(history[k] for k in sorted(history))
     return history, dates
 
+def fetch_validated(source, attempts=3):
+    for attempt in range(attempts):
+        try:
+            data = fetch(source)
+            return data, normalize(source, data)
+        except Exception:
+            if attempt == attempts - 1: raise
+            time.sleep(attempt + 1)
+
 def collect():
     now = datetime.now(timezone.utc); date = now.date().isoformat(); folder = ROOT/'data/raw'/date; folder.mkdir(parents=True, exist_ok=True); results=[]
     def collect_one(s):
         path = folder/(s['id']+'.json.gz')
         try:
-            data = fetch(s); rows = normalize(s, data)
+            data, rows = fetch_validated(s)
             # Write a complete file atomically; a failed rerun cannot masquerade as today's successful source.
             temp = path.with_suffix('.tmp')
             with temp.open('wb') as raw:
