@@ -1,25 +1,25 @@
 {
-  "run_time": "2026-11-02T21:46:06.562240Z",
+  "run_time": "2026-11-03T19:34:49.129329Z",
   "first_run_date": "2026-11-02",
-  "days_with_success": 1,
-  "open": 4481,
-  "new_today": 0,
-  "removed_today": 0,
+  "days_with_success": 2,
+  "open": 4513,
+  "new_today": 153,
+  "removed_today": 121,
   "sources": [
     {
       "name": "BlackRock",
       "ok": true,
-      "count": 244
+      "count": 253
     },
     {
       "name": "Invesco",
       "ok": true,
-      "count": 204
+      "count": 206
     },
     {
       "name": "Fidelity",
       "ok": true,
-      "count": 824
+      "count": 809
     },
     {
       "name": "Dimensional",
@@ -29,17 +29,17 @@
     {
       "name": "T. Rowe Price",
       "ok": true,
-      "count": 131
+      "count": 134
     },
     {
       "name": "State Street",
       "ok": true,
-      "count": 1118
+      "count": 1140
     },
     {
       "name": "Vanguard",
       "ok": true,
-      "count": 333
+      "count": 346
     },
     {
       "name": "Apollo",
@@ -54,12 +54,12 @@
     {
       "name": "Point72",
       "ok": true,
-      "count": 198
+      "count": 197
     },
     {
       "name": "Bridgewater Associates",
       "ok": true,
-      "count": 20
+      "count": 21
     },
     {
       "name": "Connor, Clark & Lunn",
@@ -69,7 +69,7 @@
     {
       "name": "TPG",
       "ok": true,
-      "count": 19
+      "count": 18
     },
     {
       "name": "Jane Street",
@@ -94,27 +94,27 @@
     {
       "name": "WisdomTree UK",
       "ok": true,
-      "count": 7
+      "count": 6
     },
     {
       "name": "Thrivent",
       "ok": true,
-      "count": 309
+      "count": 310
     },
     {
       "name": "Neuberger Berman",
       "ok": true,
-      "count": 94
+      "count": 92
     },
     {
       "name": "AllianceBernstein",
       "ok": true,
-      "count": 86
+      "count": 88
     },
     {
       "name": "Hartford",
       "ok": true,
-      "count": 234
+      "count": 232
     },
     {
       "name": "Northern Trust",
@@ -125,7 +125,7 @@
     {
       "name": "TIAA / Nuveen",
       "ok": true,
-      "count": 151
+      "count": 152
     },
     {
       "name": "GMO",
