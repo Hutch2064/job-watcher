@@ -14,9 +14,9 @@ def test_conversions():
         assert row['posting_id']==source['id']+':'+sid and row['in_role']=='true'
 
 def test_title_rules():
-    for title in ['Portfolio Analyst','Investment Solutions Associate','ETF Research Analyst','Fixed Income Analyst','Wealth Management Analyst']:
+    for title in ['Portfolio Analyst','Investment Solutions Associate','ETF Research Analyst','Fixed Income Analyst','Wealth Management Analyst','Performance Analyst','Risk Analyst','Operational Due Diligence Analyst','Investment Accounting Analyst','Portfolio Reconciliation Analyst','Investment Operations Analyst','Operations Analyst','Corporate Actions Analyst','Research Associate','Fund Accounting Analyst']:
         assert watcher.in_role(title)
-    for title in ['Investment Accounting Analyst','Portfolio Software Engineer','Sales Associate','Recruiter']:
+    for title in ['Portfolio Software Engineer','Sales Associate','Recruiter']:
         assert not watcher.in_role(title)
 
 def test_history_removals_failures_and_reappearance(tmp_path, monkeypatch):
@@ -41,6 +41,7 @@ def test_experience_classification():
     assert classify('Portfolio Analyst', '<p>1-3 years of relevant investment experience</p>')[0] == 'early'
     assert classify('Investment Analyst', '<li>Minimum of 3+ years of relevant experience</li>')[0] == 'experienced'
     assert classify('Investment Analyst', '<li>Two years of experience required</li>')[0] == 'early'
+    assert classify('Investment Analyst', '<li>two (2) years of experience required</li>')[0] == 'early'
     assert classify('Investment Analyst', '<li>Five years of experience preferred</li>')[0] == 'unknown'
     assert classify('Investment Analyst', 'We have served clients for 30 years.')[0] == 'unknown'
     assert classify('Investment Analyst', 'Experienced candidate with 6 - 8-year post-graduation experience.')[0] == 'experienced'
@@ -135,3 +136,81 @@ def test_same_day_rerun_failure_removes_only_that_sources_raw(tmp_path, monkeypa
     assert not (folder/'a.json.gz').exists() and (folder/'b.json.gz').exists()
     assert status['days_with_success']==1 and status['successful_dates']==['2026-02-03']
     assert status['open']==1 and status['sources'][0]['ok'] is False
+
+def test_ashby_normalization_and_duties():
+    source = {'id':'globalx','name':'Global X','type':'ashby','board':'global-x-etfs'}
+    payload = {'jobs':[{'id':'abc-123','title':'Investment Operations Analyst','location':'New York, NY','department':'Operations','publishedAt':'2026-11-02T12:10:00Z','jobUrl':'https://jobs.ashbyhq.com/global-x-etfs/abc-123','descriptionPlain':'About us\nWe are a company.\nResponsibilities\nAnalyze portfolio performance and trading activity to support investment decisions.\nRequirements\nTwo years of relevant experience.'}]}
+    row=watcher.normalize(source,payload)[0]
+    assert (row['posting_id'],row['location'],row['department'],row['posted_date'])==('globalx:abc-123','New York, NY','Operations','2026-11-02')
+    assert row['in_role']=='true' and row['experience']=='early'
+    assert row['duty_excerpt']=='Analyze portfolio performance and trading activity to support investment decisions.'
+
+def test_workday_refuses_a_potentially_truncated_board(monkeypatch):
+    import pytest
+    source={'id':'w','name':'W','type':'workday','host':'test.wd1','board':'External'}
+    monkeypatch.setattr(watcher,'request',lambda *args,**kwargs:{'total':2000,'jobPostings':[{'title':'Analyst','externalPath':'/job/X_1'}]})
+    with pytest.raises(ValueError,match='may be capped'):
+        watcher.fetch(source)
+
+def test_ukg_json_normalization_and_complete_pagination(monkeypatch):
+    source={'id':'vaneck','name':'VanEck','type':'ukg','host':'vaneck.rec.pro.ukg.net','tenant':'VAN1502VEAC','board':'board-id'}
+    job={'Id':'job-123','Title':'Investment Operations Analyst','Locations':[{'Address':{'City':'New York','State':{'Code':'NY'}}}],'JobCategoryName':'Investments','PostedDate':'2026-11-03T09:00:00Z','BriefDescription':'Analyze investment portfolio performance and risk exposures.'}
+    calls=[]
+    def request(url,payload=None):
+        calls.append(payload['opportunitySearch']['Skip'])
+        return {'opportunities':[job],'totalCount':1,'locations':[]}
+    monkeypatch.setattr(watcher,'request',request)
+    raw=watcher.fetch(source);row=watcher.normalize(source,raw)[0]
+    assert calls==[0] and row['posting_id']=='vaneck:job-123' and row['location']=='New York, NY'
+    assert row['department']=='Investments' and row['posted_date']=='2026-11-03'
+    assert row['url'].endswith('OpportunityDetail?opportunityId=job-123') and row['in_role']=='true'
+    assert row['duty_excerpt']=='Analyze investment portfolio performance and risk exposures.'
+
+def test_cover_letter_evidence_from_form_and_description():
+    base=[{'label':'First Name','required':True,'fields':[{'name':'first_name','type':'input_text'}]},{'label':'Email','required':True,'fields':[{'name':'email','type':'input_text'}]}]
+    def form(required): return {'questions':base+[{'label':'Cover Letter','required':required,'fields':[{'name':'cover_letter','type':'input_file'}]}]}
+    assert watcher.cover_letter_assessment('',form(True))[0]=='required'
+    assert watcher.cover_letter_assessment('',form(False))[0]=='optional'
+    assert watcher.cover_letter_assessment('',{'questions':base})[0]=='not_listed'
+    assert watcher.cover_letter_assessment('',{'questions':[]})[0]=='unknown'
+    assert watcher.cover_letter_assessment('',None)[0]=='unknown'
+    assert watcher.cover_letter_assessment('Please submit a cover letter.',form(False))[0]=='review'
+    assert watcher.cover_letter_assessment('Please submit a cover letter.',None)[0]=='review'
+    combo={'questions':base+[{'label':'Upload resume or cover letter','required':True,'fields':[{'name':'question_1','type':'input_file'}]}]}
+    assert watcher.cover_letter_assessment('',combo)[0]=='review'
+    combined_desc={'questions':base+[{'label':'Resume','description':'Attach a cover letter in the same file','required':True,'fields':[{'name':'resume','type':'input_file'}]}]}
+    assert watcher.cover_letter_assessment('',combined_desc)[0]=='review'
+
+def test_greenhouse_form_details_are_retained_and_form_failure_is_isolated(monkeypatch):
+    source={'id':'g','name':'G','type':'greenhouse','board':'demo'}
+    jobs=[{'id':1,'title':'Portfolio Analyst','absolute_url':'https://example.com/1'},{'id':2,'title':'Risk Analyst','absolute_url':'https://example.com/2'}]
+    base=[{'label':'First Name','required':True,'fields':[{'name':'first_name','type':'input_text'}]},{'label':'Email','required':True,'fields':[{'name':'email','type':'input_text'}]}]
+    def request(url,payload=None):
+        if '?content=true' in url:return {'jobs':jobs}
+        if '/1?' in url:return {'id':1,'questions':base+[{'label':'Cover Letter','required':True,'fields':[{'name':'cover_letter','type':'input_file'}]}]}
+        raise OSError('detail unavailable')
+    monkeypatch.setattr(watcher,'request',request)
+    raw=watcher.fetch(source);rows=watcher.normalize(source,raw)
+    assert len(rows)==2 and raw['form_details']['1']['id']==1 and '2' not in raw['form_details']
+    assert [x['cover_letter'] for x in rows]==['required','unknown']
+
+def test_duty_excerpt_prefers_actual_responsibilities():
+    text='Our investment research model has been used for decades.\nWhat do Investment Associates at Bridgewater do?\nResearch the drivers of economies and markets. Build the insights that inform portfolio decisions.\nQualifications\nExperience in investment research.'
+    assert watcher.duty_excerpt(text).startswith('Research the drivers of economies and markets.')
+
+def test_source_posting_dates_are_utc():
+    assert watcher.utc_date('2026-11-02T23:30:00-05:00') == '2026-11-03'
+    assert watcher.utc_date('2026-11-03T01:30:00Z') == '2026-11-03'
+    assert watcher.utc_date(None) == ''
+
+def test_ukg_fetches_all_pages_and_rejects_incomplete(monkeypatch):
+    import pytest
+    source={'id':'x','name':'X','type':'ukg','host':'example.com','tenant':'tenant','board':'board'}
+    def request(url,payload=None):
+        skip=payload['opportunitySearch']['Skip']
+        return {'opportunities':[{'Id':str(i),'Title':'Analyst'} for i in range(skip,min(skip+50,51))], 'totalCount':51}
+    monkeypatch.setattr(watcher,'request',request)
+    assert sum(len(p['opportunities']) for p in watcher.fetch(source)['pages'])==51
+    monkeypatch.setattr(watcher,'request',lambda url,payload=None:{'opportunities':[], 'totalCount':1})
+    with pytest.raises(ValueError,match='Incomplete'):
+        watcher.fetch(source)

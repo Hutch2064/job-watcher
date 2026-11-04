@@ -176,5 +176,243 @@
     "type": "workday",
     "host": "americancentury.wd5",
     "board": "avantiscareers"
+  },
+  {
+    "id": "capitalgroup",
+    "name": "Capital Group",
+    "type": "workday",
+    "host": "capgroup.wd1",
+    "board": "capitalgroupcareers"
+  },
+  {
+    "id": "pimco",
+    "name": "PIMCO",
+    "type": "workday",
+    "host": "pimco.wd1",
+    "board": "pimco-careers"
+  },
+  {
+    "id": "wellington",
+    "name": "Wellington Management",
+    "type": "workday",
+    "host": "wellington.wd5",
+    "board": "efc"
+  },
+  {
+    "id": "russell",
+    "name": "Russell Investments",
+    "type": "workday",
+    "host": "russell.wd5",
+    "board": "russellinvestments"
+  },
+  {
+    "id": "fiera",
+    "name": "Fiera Capital",
+    "type": "workday",
+    "host": "fieracapital.wd3",
+    "board": "Career"
+  },
+  {
+    "id": "pgim",
+    "name": "PGIM / Prudential",
+    "type": "workday",
+    "host": "pru.wd5",
+    "board": "careers"
+  },
+  {
+    "id": "texaspsf",
+    "name": "Texas Permanent School Fund",
+    "type": "workday",
+    "host": "texaspsf.wd501",
+    "board": "texaspsfcareers"
+  },
+  {
+    "id": "ontarioteachers",
+    "name": "Ontario Teachers Pension Plan",
+    "type": "workday",
+    "host": "otppb.wd3",
+    "board": "OntarioTeachers_Careers"
+  },
+  {
+    "id": "ares",
+    "name": "Ares Management",
+    "type": "workday",
+    "host": "aresmgmt.wd1",
+    "board": "External"
+  },
+  {
+    "id": "manulife",
+    "name": "Manulife",
+    "type": "workday",
+    "host": "manulife.wd3",
+    "board": "MFCJH_Jobs"
+  },
+  {
+    "id": "cambridgeassociates",
+    "name": "Cambridge Associates",
+    "type": "workday",
+    "host": "cambridgeassociates.wd5",
+    "board": "cambridge_associates"
+  },
+  {
+    "id": "bmo",
+    "name": "BMO",
+    "type": "workday",
+    "host": "bmo.wd3",
+    "board": "External"
+  },
+  {
+    "id": "athora",
+    "name": "Athora",
+    "type": "workday",
+    "host": "athora.wd3",
+    "board": "athora-careers"
+  },
+  {
+    "id": "jupiteram",
+    "name": "Jupiter Asset Management",
+    "type": "workday",
+    "host": "jupiteram.wd3",
+    "board": "jupiter_careers"
+  },
+  {
+    "id": "nystrs",
+    "name": "New York State Teachers Retirement System",
+    "type": "workday",
+    "host": "nystrs.wd12",
+    "board": "NYSTRS_Careers"
+  },
+  {
+    "id": "caat",
+    "name": "CAAT Pension Plan",
+    "type": "workday",
+    "host": "caatpension.wd10",
+    "board": "Careers"
+  },
+  {
+    "id": "brookfield",
+    "name": "Brookfield",
+    "type": "workday",
+    "host": "brookfield.wd5",
+    "board": "brookfield"
+  },
+  {
+    "id": "iconiq",
+    "name": "ICONIQ",
+    "type": "greenhouse",
+    "board": "iconiq"
+  },
+  {
+    "id": "vise",
+    "name": "Vise",
+    "type": "greenhouse",
+    "board": "viseai"
+  },
+  {
+    "id": "forteus",
+    "name": "Forteus / Numeus",
+    "type": "greenhouse",
+    "board": "numus"
+  },
+  {
+    "id": "choreo",
+    "name": "Choreo",
+    "type": "greenhouse",
+    "board": "choreo"
+  },
+  {
+    "id": "starmountain",
+    "name": "Star Mountain Capital",
+    "type": "greenhouse",
+    "board": "starmountaincapital"
+  },
+  {
+    "id": "cais",
+    "name": "CAIS",
+    "type": "greenhouse",
+    "board": "cais"
+  },
+  {
+    "id": "cclquant",
+    "name": "CC&L Quantitative",
+    "type": "greenhouse",
+    "board": "cclconfidential"
+  },
+  {
+    "id": "galvanize",
+    "name": "Galvanize",
+    "type": "greenhouse",
+    "board": "galvanizeclimatesolutions"
+  },
+  {
+    "id": "merceradvisors",
+    "name": "Mercer Advisors",
+    "type": "greenhouse",
+    "board": "merceradvisors"
+  },
+  {
+    "id": "icapital",
+    "name": "iCapital",
+    "type": "greenhouse",
+    "board": "icapitalnetwork"
+  },
+  {
+    "id": "wisdomtreeus",
+    "name": "WisdomTree US",
+    "type": "lever",
+    "board": "wisdomtree"
+  },
+  {
+    "id": "epwealth",
+    "name": "EP Wealth Advisors",
+    "type": "lever",
+    "board": "epwealth"
+  },
+  {
+    "id": "wealthfront",
+    "name": "Wealthfront",
+    "type": "lever",
+    "board": "wealthfront"
+  },
+  {
+    "id": "globalx",
+    "name": "Global X ETFs",
+    "type": "ashby",
+    "board": "global-x-etfs"
+  },
+  {
+    "id": "range",
+    "name": "Range",
+    "type": "ashby",
+    "board": "range"
+  },
+  {
+    "id": "compound",
+    "name": "Compound Planning",
+    "type": "ashby",
+    "board": "compound"
+  },
+  {
+    "id": "calamos",
+    "name": "Calamos Investments",
+    "type": "ukg",
+    "host": "recruiting2.ultipro.com",
+    "tenant": "CAL1001CALA",
+    "board": "46b96419-fba6-4dd0-a5fa-715bdfcf845b"
+  },
+  {
+    "id": "vaneck",
+    "name": "VanEck",
+    "type": "ukg",
+    "host": "vaneck.rec.pro.ukg.net",
+    "tenant": "VAN1502VEAC",
+    "board": "9158c56d-61c9-447f-98b1-4ba0b04ca31d"
+  },
+  {
+    "id": "americancentury",
+    "name": "American Century Investments",
+    "type": "workday",
+    "host": "americancentury.wd5",
+    "board": "AmericanCenturyInvestments"
   }
 ]

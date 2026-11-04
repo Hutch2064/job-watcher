@@ -10,14 +10,15 @@ import re
 import sys
 import time
 import urllib.request
+from urllib.parse import urlencode
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = json.loads((ROOT / 'sources.json').read_text())
-FIELDS = 'posting_id source source_id employer title location department posted_date url in_role first_run first_seen last_seen status removed_date experience experience_reason'.split()
-ROLE = re.compile(r'\b(portfolio|asset allocation|investment|investing|equity research|fixed.income|credit research|credit analyst|equity analyst|quantitative research|quantitative analyst|fund research|manager research|etf|wealth (?:management|advisor)|financial planning|investment consulting|ocio|multi.asset|systematic|risk analytics|research analyst)\b', re.I)
-EXCLUDE = re.compile(r'\b(sales|marketing|accounting|accountant|reconciliation|administrative assistant|recruiter|tax|auditor|software engineer|cybersecurity|compliance|legal counsel)\b', re.I)
+FIELDS = 'posting_id source source_id employer title location department posted_date url in_role first_run first_seen last_seen status removed_date experience experience_reason duty_excerpt cover_letter cover_letter_reason'.split()
+ROLE = re.compile(r'\b(portfolio|asset allocation|investment|investing|equity research|fixed.income|credit research|credit analyst|equity analyst|quantitative research|quantitative analyst|fund research|manager research|etf|wealth (?:management|advisor)|financial planning|investment consulting|ocio|multi.asset|systematic|risk analytics|risk analyst|risk analysis|risk reporting|performance analyst|performance analysis|performance attribution|performance reporting|due diligence|investment operations|trade operations|trading operations|operations analyst|operations associate|operations specialist|trade support|corporate actions|fund accounting|fund administration|asset management|research analyst|research associate)\b', re.I)
+EXCLUDE = re.compile(r'\b(sales|marketing|administrative assistant|recruiter|tax|auditor|software engineer|cybersecurity|legal counsel)\b', re.I)
 
 # Accept joined titles such as InvestmentIntern without matching Internal or International.
 INTERNSHIP = re.compile(r'intern(?!al|ation|et)(?:ship|s)?', re.I)
@@ -40,6 +41,58 @@ class DescriptionText(HTMLParser):
 def plain_text(value):
     parser = DescriptionText(); parser.feed(unescape(value or '')); return unescape(''.join(parser.parts))
 
+# Select an actual responsibility sentence when available; a missing excerpt is not a negative fit judgment.
+DUTY_ACTION = re.compile(r'\b(analy[sz]e|analys[ei]s|research|evaluat\w*|monitor\w*|assess\w*|attribut\w*|construct\w*|allocat\w*|optimi[sz]\w*|model\w*|rebalanc\w*|support\w*|perform\w*|conduct\w*|develop\w*|prepare\w*|review\w*|due diligence)\b', re.I)
+DUTY_SUBJECT = re.compile(r'\b(portfolio\w*|investment\w*|fund\w*|securit\w*|manager\w*|asset\w*|market\w*|risk\w*|performance|attribution|benchmark\w*|credit|trading|rebalanc\w*)\b', re.I)
+DUTY_START = re.compile(r'\b(responsibilities|what you(?:.ll| will) do|what you can expect|key duties|what do .{0,80} do|duties)\b', re.I)
+DUTY_END = re.compile(r'\b(qualifications|requirements|what you(?:.ll| will) bring|what will set you apart|benefits|about (?:us|the company)|salary)\b', re.I)
+
+def duty_excerpt(description):
+    lines = [re.sub(r'^[•\-*]\s*', '', ' '.join(line.split())) for line in plain_text(description).splitlines()]
+    active = False; preferred = []; fallback = []
+    for line in lines:
+        if len(line) < 90 and DUTY_START.search(line): active = True; continue
+        if len(line) < 90 and DUTY_END.search(line): active = False; continue
+        if len(line) < 35 or not DUTY_ACTION.search(line) or not DUTY_SUBJECT.search(line): continue
+        # Limit the display to one excerpt rather than implying a full job assessment.
+        excerpt = line if len(line) <= 240 else line[:237].rstrip() + '…'
+        (preferred if active else fallback).append(excerpt)
+    return next(iter(preferred or fallback), '')
+
+COVER_TERM = re.compile(r'\b(?:cover(?:ing)?[\s-]*letter|cover[\s-]*note|motivation(?:al)?[\s-]*letter|letter of (?:motivation|interest))\b', re.I)
+
+def cover_letter_assessment(description, form=None):
+    # A job description or form can change. Only describe the evidence actually observed.
+    mentions = [line.strip() for line in plain_text(description).splitlines() if COVER_TERM.search(line)]
+    if not isinstance(form, dict) or not isinstance(form.get('questions'), list):
+        return ('review', 'Description mentions a cover letter; check the application') if mentions else ('unknown', 'Application form not checked')
+    field_names = {str(field.get('name') or '') for question in form['questions'] if isinstance(question,dict) for field in (question.get('fields') or []) if isinstance(field,dict)}
+    if not {'first_name', 'email'}.issubset(field_names):
+        return ('review', 'Description mentions a cover letter; check the application') if mentions else ('unknown', 'Application form incomplete or unavailable')
+    matches = []
+    for question in form['questions']:
+        if not isinstance(question, dict): continue
+        label = plain_text(str(question.get('label') or ''))
+        field_description = plain_text(str(question.get('description') or ''))
+        label_and_description = label + ' ' + field_description
+        fields = question.get('fields') or []
+        names = ' '.join(str(x.get('name') or '') for x in fields if isinstance(x, dict))
+        if not COVER_TERM.search(label_and_description) and not re.search(r'cover_?letter', names, re.I): continue
+        types = {str(x.get('type') or '') for x in fields if isinstance(x,dict)}
+        combined = bool(re.search(r'\b(resume|r[eé]sum[eé]|cv)\b', label_and_description, re.I)) or bool(re.search(r'\bresume\b', names, re.I))
+        if combined or not types.intersection({'input_file','textarea','input_text'}):
+            return ('review', 'Application form mentions a cover letter; check the field')
+        required = question.get('required')
+        if required not in (True,False): return ('review', 'Application form mentions a cover letter; check the field')
+        matches.append(required)
+    if any(matches): return ('required', 'Required field in employer application form')
+    if matches:
+        if mentions and re.search(r'\b(required|must|mandatory|please (?:submit|include|provide|attach))\b', ' '.join(mentions), re.I) and not re.search(r'\b(optional|not required|not necessary)\b', ' '.join(mentions), re.I):
+            return ('review', 'Form says optional but description mentions a requirement')
+        return ('optional', 'Optional field in employer application form')
+    if mentions: return ('review', 'Description mentions a cover letter; check the application')
+    return ('not_listed', 'No cover-letter field found in the employer form')
+
 SENIOR = re.compile(r'\b(senior|sr\.?|staff|lead|principal|director|vice president|avp|vp|svp|evp|head of|chief|partner|managing director)\b', re.I)
 YEARS = re.compile(r'\b(?P<min>\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*(?:(?:-|–|—|to)\s*(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten))?\s*(?:\+|or more)?[\s-]*(?:years?|yrs?)\b', re.I)
 NUMBERS = {'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10}
@@ -49,6 +102,7 @@ def experience_level(title, description=''):
     if SENIOR.search(title): return ('experienced', 'Senior-level title')
     observations = []
     for line in plain_text(description).splitlines():
+        line = re.sub(r'\b(?:zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*\((\d+)\)', r'\1', line, flags=re.I)
         line = re.sub(r'\b(experience)\.\s+(?=\d)', r'\1: ', line, flags=re.I)
         for sentence in re.split(r'(?<=[.!?])\s+', line):
             for match in YEARS.finditer(sentence):
@@ -81,6 +135,37 @@ def fetch(source):
         data = request(f'https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true')
         if not isinstance(data.get('jobs'), list): raise ValueError('Missing jobs list')
         if len(data['jobs']) > 5000: raise ValueError('Board exceeds 5,000; configure a supported search')
+        # Greenhouse's public job-detail JSON includes the actual application questions.
+        # A failed form lookup must not fail the board or imply a missing posting.
+        def form(job):
+            try:
+                info = request(f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{job['id']}?questions=true")
+                if str(info.get('id')) != str(job['id']) or not isinstance(info.get('questions'),list): return str(job['id']), None
+                return str(job['id']), info
+            except Exception:
+                return str(job['id']), None
+        relevant = [job for job in data['jobs'] if job.get('title') and in_role(job['title'])]
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            data['form_details'] = {key:value for key,value in pool.map(form,relevant) if value is not None}
+        return data
+    if kind == 'ukg':
+        base = f"https://{source['host']}/{source['tenant']}/JobBoard/{board}"
+        pages = []; offset = 0; total = None
+        while total is None or offset < total:
+            payload = {'opportunitySearch':{'Top':50,'Skip':offset,'QueryString':'','OrderBy':[{'Value':'postedDateDesc','PropertyName':'PostedDate','Ascending':False}],'Filters':[]},'matchCriteria':{'PreferredJobs':[],'Educations':[],'LicenseAndCertifications':[],'Skills':[],'hasNoLicenses':False,'SkippedSkills':[]}}
+            page = request(base+'/JobBoardView/LoadSearchResults',payload)
+            if not isinstance(page.get('opportunities'),list) or not isinstance(page.get('totalCount'),int): raise ValueError('Invalid UKG response')
+            if total is None: total = page['totalCount']
+            if total > 5000: raise ValueError('Board exceeds 5,000; configure a supported search')
+            if page['totalCount'] != total or (offset < total and not page['opportunities']): raise ValueError('Incomplete or changing UKG pagination')
+            pages.append(page); offset += len(page['opportunities'])
+            if total == 0: break
+        if offset != total: raise ValueError('Incomplete UKG board')
+        return {'pages':pages}
+    if kind == 'ashby':
+        data = request(f'https://api.ashbyhq.com/posting-api/job-board/{board}')
+        if not isinstance(data.get('jobs'), list): raise ValueError('Missing jobs list')
+        if len(data['jobs']) > 5000: raise ValueError('Board exceeds 5,000; configure a supported search')
         return data
     if kind == 'lever':
         data = request(f'https://api.lever.co/v0/postings/{board}?mode=json')
@@ -93,6 +178,7 @@ def fetch(source):
         page = request(base, {'appliedFacets':{}, 'limit':20, 'offset':offset, 'searchText':source.get('search','')})
         if not isinstance(page.get('jobPostings'), list) or not isinstance(page.get('total'), int): raise ValueError('Invalid Workday response')
         if total is None: total = page['total']
+        if total == 2000: raise ValueError('Workday total may be capped at 2,000; partition or configure a verified search')
         if total > 5000 and not source.get('search'): raise ValueError('Board exceeds 5,000; configure a search')
         if (page['total'] not in (0, total)) or (offset < total and not page['jobPostings']): raise ValueError('Incomplete or changing pagination')
         pages.append(page); offset += len(page['jobPostings'])
@@ -124,26 +210,54 @@ def fetch(source):
         details = dict(pool.map(detail, postings))
     return {'pages':pages, 'details':details, 'recovered_titles':recovered_titles}
 
+def utc_date(value):
+    if not value: return ''
+    try:
+        moment = datetime.fromisoformat(value.replace('Z','+00:00'))
+        if moment.tzinfo is None: moment = moment.replace(tzinfo=timezone.utc)
+        return moment.astimezone(timezone.utc).date().isoformat()
+    except (AttributeError, TypeError, ValueError):
+        return ''
+
 def normalize(source, data):
     kind = source['type']; rows = []
-    if kind == 'greenhouse': items = data['jobs']
+    if kind in ('greenhouse', 'ashby'): items = data['jobs']
     elif kind == 'lever': items = data
+    elif kind == 'ukg': items = [j for page in data['pages'] for j in page['opportunities']]
     else: items = [j for page in data['pages'] for j in page['jobPostings']]
     for j in items:
         if kind == 'greenhouse':
             sid = str(j['id']); loc = (j.get('location') or {}).get('name',''); dep = ', '.join(d.get('name','') for d in j.get('departments',[])); url = j['absolute_url']; posted = (j.get('first_published') or '')[:10]
+        elif kind == 'ukg':
+            if not j.get('Id'): raise ValueError('UKG posting has no ID')
+            sid = str(j['Id']); locations = []
+            for item in j.get('Locations', []):
+                if isinstance(item,str): label=item
+                else:
+                    addr=item.get('Address') or {}; state=addr.get('State') or {}
+                    label=', '.join(x for x in (addr.get('City'),state.get('Code')) if x) or item.get('LocalizedDescription') or item.get('LocalizedName') or ''
+                if label and label not in locations: locations.append(label)
+            loc=' / '.join(locations); dep=j.get('JobCategoryName') or ''; posted=utc_date(j.get('PostedDate'))
+            url=f"https://{source['host']}/{source['tenant']}/JobBoard/{source['board']}/OpportunityDetail?"+urlencode({'opportunityId':sid})
+        elif kind == 'ashby':
+            if not j.get('id'): raise ValueError('Ashby posting has no ID')
+            sid = str(j['id']); loc = j.get('location',''); dep = j.get('department',''); url = j['jobUrl']; posted = utc_date(j.get('publishedAt'))
         elif kind == 'lever':
             sid = str(j['id']); cat = j.get('categories') or {}; loc = cat.get('location',''); dep = cat.get('department') or cat.get('team') or ''; url = j['hostedUrl']; posted = datetime.fromtimestamp(j['createdAt']/1000, timezone.utc).date().isoformat() if j.get('createdAt') else ''
         else:
             path = j['externalPath']; sid = path.rsplit('_',1)[-1]; loc = j.get('locationsText',''); dep = ''; posted = ''; url = f"https://{source['host']}.myworkdayjobs.com/en-US/{source['board']}{path}"
-        title = j['text'] if kind == 'lever' else (j.get('title') or data.get('recovered_titles', {}).get(j.get('externalPath', '')) if kind == 'workday' else j['title'])
+        title = j['text'] if kind == 'lever' else (j['Title'] if kind == 'ukg' else (j.get('title') or data.get('recovered_titles', {}).get(j.get('externalPath', '')) if kind == 'workday' else j['title']))
         if not title: raise ValueError('Posting title unavailable')
         if kind == 'greenhouse': description = j.get('content', '')
+        elif kind == 'ukg': description = j.get('BriefDescription') or ''
+        elif kind == 'ashby': description = j.get('descriptionPlain') or j.get('descriptionHtml') or ''
         elif kind == 'lever':
             description = ' '.join([j.get('descriptionPlain') or j.get('description') or '', j.get('additionalPlain') or j.get('additional') or ''] + [x.get('text', '') + ' ' + (x.get('content') or '') for x in j.get('lists', [])])
         else: description = data.get('details', {}).get(j['externalPath'], '')
         level, reason = experience_level(title, description)
-        rows.append(dict(experience=level, experience_reason=reason, posting_id=source['id']+':'+sid, source=source['id'], source_id=sid, employer=source['name'], title=title, location=loc or '', department=dep or '', posted_date=posted, url=url, in_role=str(in_role(title)).lower()))
+        form = data.get('form_details', {}).get(sid) if kind == 'greenhouse' else None
+        cover, cover_reason = cover_letter_assessment(description, form)
+        rows.append(dict(experience=level, experience_reason=reason, duty_excerpt=duty_excerpt(description) if in_role(title) else '', cover_letter=cover, cover_letter_reason=cover_reason, posting_id=source['id']+':'+sid, source=source['id'], source_id=sid, employer=source['name'], title=title, location=loc or '', department=dep or '', posted_date=posted, url=url, in_role=str(in_role(title)).lower()))
     if len({r['posting_id'] for r in rows}) != len(rows): raise ValueError('Duplicate source IDs')
     return rows
 

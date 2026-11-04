@@ -6,28 +6,19 @@ A daily job watcher for investment research, portfolio construction, allocation,
 
 ## Sources
 
-`sources.json` is the authoritative configuration. The initial watchlist has the following public JSON boards; the status on Today shows the result of the latest check. BlackRock includes iShares; Dimensional includes DFA. WisdomTree UK is its UK Lever board, not a claim to cover every WisdomTree location. State Street's board includes the wider company alongside its investment business. The same applies to other diversified firms. An employer can legitimately have zero openings. No board in the initial configuration has been intentionally searched by a term; if an unfiltered board exceeds 5,000, collection fails for that source until a search is configured rather than silently truncating it.
+`sources.json` is the authoritative configuration. The watchlist has the following public JSON boards; the status on Today shows the result of the latest check. BlackRock includes iShares; Dimensional includes DFA. WisdomTree UK is its UK Lever board, not a claim to cover every WisdomTree location. State Street's board includes the wider company alongside its investment business. The same applies to other diversified firms. An employer can legitimately have zero openings. No configured board is filtered by a search term. A board exceeding 5,000 postings fails validation rather than being truncated. Workday responses reporting exactly 2,000 are also rejected because that can be a capped result.
 
-| Employer | ATS |
+| Employer / board | ATS |
 |---|---|
-| BlackRock / iShares | Workday |
+| BlackRock | Workday |
 | Invesco | Workday |
 | Fidelity | Workday |
-| Dimensional / DFA | Workday |
+| Dimensional | Workday |
 | T. Rowe Price | Workday |
 | State Street | Workday |
 | Vanguard | Workday |
 | Apollo | Workday |
 | Millennium | Workday |
-| Thrivent | Workday |
-| Neuberger Berman | Workday |
-| AllianceBernstein | Workday |
-| Hartford | Workday |
-| Northern Trust | Workday |
-| TIAA / Nuveen | Workday |
-| GMO | Lever |
-| Harris / Oakmark | Greenhouse |
-| Avantis Investors | Workday |
 | Point72 | Greenhouse |
 | Bridgewater Associates | Greenhouse |
 | Connor, Clark & Lunn | Greenhouse |
@@ -37,12 +28,57 @@ A daily job watcher for investment research, portfolio construction, allocation,
 | Man Group | Greenhouse |
 | AQR | Greenhouse |
 | WisdomTree UK | Lever |
+| Thrivent | Workday |
+| Neuberger Berman | Workday |
+| AllianceBernstein | Workday |
+| Hartford | Workday |
+| Northern Trust | Workday |
+| TIAA / Nuveen | Workday |
+| GMO | Lever |
+| Harris /  Oakmark | Greenhouse |
+| Avantis Investors | Workday |
+| Capital Group | Workday |
+| PIMCO | Workday |
+| Wellington Management | Workday |
+| Russell Investments | Workday |
+| Fiera Capital | Workday |
+| PGIM / Prudential | Workday |
+| Texas Permanent School Fund | Workday |
+| Ontario Teachers Pension Plan | Workday |
+| Ares Management | Workday |
+| Manulife | Workday |
+| Cambridge Associates | Workday |
+| BMO | Workday |
+| Athora | Workday |
+| Jupiter Asset Management | Workday |
+| New York State Teachers Retirement System | Workday |
+| CAAT Pension Plan | Workday |
+| Brookfield | Workday |
+| ICONIQ | Greenhouse |
+| Vise | Greenhouse |
+| Forteus / Numeus | Greenhouse |
+| Choreo | Greenhouse |
+| Star Mountain Capital | Greenhouse |
+| CAIS | Greenhouse |
+| CC&L Quantitative | Greenhouse |
+| Galvanize | Greenhouse |
+| Mercer Advisors | Greenhouse |
+| iCapital | Greenhouse |
+| WisdomTree US | Lever |
+| EP Wealth Advisors | Lever |
+| Wealthfront | Lever |
+| Global X ETFs | Ashby |
+| Range | Ashby |
+| Compound Planning | Ashby |
+| Calamos Investments | UKG Pro Recruiting |
+| VanEck | UKG Pro Recruiting |
+| American Century Investments | Workday |
 
 See [SOURCE_REVIEW.md](SOURCE_REVIEW.md) for requested brands mapped to the watchlist, investigated sources, and names still requiring individual verification. Those without an accessible, verified JSON board are not represented as watched. This is a practical coverage limit, not a conclusion that they have no openings; employer recruiting sites and access policies change. Some brands share a parent employer's board and cannot be isolated reliably from its other postings. No HTML scraping is used.
 
 ## How the pipeline works
 
-At 12:23 UTC daily, GitHub Actions requests every board independently, paginating Workday, validates completeness and unique IDs, retries failed or changing boards up to three times, writes each successful full JSON response to `data/raw/YYYY-MM-DD/<source>.json.gz`, and records each result. An incomplete, blocked or failed board gets no raw file on that date. On a same-day rerun its previous raw file is replaced or removed; a failed check cannot imply removals. The program rebuilds `data/history.csv` entirely from raw files, in date order, then creates `data/status.json`. It commits the data and opens or updates the dated issue and closes the preceding day's issue. The daily workflow explicitly dispatches the test workflow after its bot commit, because GitHub does not trigger push workflows for that commit. Initial observations per source are not counted as new. On successful later snapshots missing postings are marked removed; reappearing postings retain first seen and reopen. Each source's raw data is kept in the repository. Scheduled runs can be delayed by GitHub.
+At 12:23 UTC daily, GitHub Actions requests every board independently, paginating Workday and UKG, validates completeness and unique IDs, retries failed or changing boards up to three times, writes each successful full JSON response to `data/raw/YYYY-MM-DD/<source>.json.gz`, and records each result. An incomplete, blocked or failed board gets no raw file on that date. On a same-day rerun its previous raw file is replaced or removed; a failed check cannot imply removals. The program rebuilds `data/history.csv` entirely from raw files, in date order, then creates `data/status.json`. It commits the data and opens or updates the dated issue and closes the preceding day's issue. The daily workflow explicitly dispatches the test workflow after its bot commit, because GitHub does not trigger push workflows for that commit. Initial observations per source are not counted as new. On successful later snapshots missing postings are marked removed; reappearing postings retain first seen and reopen. Each source's raw data is kept in the repository. Scheduled runs can be delayed by GitHub.
 
 Run from the repository directory:
 
@@ -59,11 +95,17 @@ The pipeline uses Python's standard library; pytest is the only test dependency.
 
 Browse defaults to early-career signals plus postings that need review. Titles containing intern or internship are early-career signals, including joined forms such as SummerIntern; internal and international are not treated as internships. Summer and program titles are also early-career signals unless the title is senior or the description mentions a minimum of three or more years. Other explicit senior titles and postings that mention a minimum of three or more years are set aside. Ranges starting below three years remain in the early-career group. Clearly preferred experience is not treated as a minimum. The rule is a heuristic: it can miss or misread requirements, alternate qualifications and seniority; open the original job description before making a decision. A title alone does not prove an analyst or associate position is entry level, so postings without a recognizable requirement are labeled “Needs review.” You can select a category or show every level.
 
-Greenhouse and Lever descriptions come from their board JSON. If a Workday listing lacks a title, the collector recovers it from the public job-detail JSON; the unmodified listing and recovered title are both stored in the raw snapshot, and unrecoverable listings fail validation. For relevant Workday titles, the collector also requests the public job-detail JSON and stores the description alongside its board snapshot. A detail request that fails leaves the posting's experience unknown, without making the source fail or marking jobs removed. Historical raw snapshots created before this enrichment do not contain Workday details and remain reproducible. The latest available snapshot determines the assessment in the history; the raw data remains the source of truth.
+Greenhouse, Lever and Ashby descriptions come from their board JSON. UKG supplies only a brief description in its JSON listing; no HTML job descriptions are scraped. Browse displays a short source-derived duty excerpt when one is available, not an automated judgment that the job fits. If a Workday listing lacks a title, the collector recovers it from the public job-detail JSON; the unmodified listing and recovered title are both stored in the raw snapshot, and unrecoverable listings fail validation. For relevant Workday titles, the collector also requests the public job-detail JSON and stores the description alongside its board snapshot. A detail request that fails leaves the posting's experience unknown, without making the source fail or marking jobs removed. Historical raw snapshots created before this enrichment do not contain Workday details and remain reproducible. The latest available snapshot determines the assessment in the history; the raw data remains the source of truth.
 
 ### Title rule
 
-Case-insensitive title matches include portfolio, asset allocation, investment/investing, equity research, fixed income, credit research or analyst, equity analyst, quantitative research or analyst, fund or manager research, ETF, wealth management/advisor, financial planning, investment consulting, OCIO, multi-asset, systematic, risk analytics, or research analyst. Titles containing sales, marketing, accounting/accountant, reconciliation, administrative assistant, recruiter, tax, auditor, software engineer, cybersecurity, compliance, or legal counsel are excluded. This deliberately broad title-only rule can miss relevant jobs or admit unrelated ones; inspect the actual role. All postings are retained regardless of the rule.
+Case-insensitive title matches include portfolio, asset allocation, investment/investing, equity and credit research or analyst, quantitative research or analyst, fund or manager research, ETF, wealth management/advisor, financial planning, investment consulting, OCIO, multi-asset, systematic, risk analytics/analyst/analysis/reporting, performance analyst/analysis/attribution/reporting, due diligence, investment or trading operations, operations analyst/associate/specialist, trade support, corporate actions, fund accounting or administration, asset management, and research analyst/associate. Titles containing sales, marketing, administrative assistant, recruiter, tax, auditor, software engineer, cybersecurity, or legal counsel are excluded. Accounting, reconciliations and compliance are no longer blanket exclusions: the responsibilities can have substantive analytical content. This deliberately broad title-only rule can miss relevant jobs or admit unrelated ones; inspect the actual role. All postings are retained regardless of the rule.
+
+### Cover-letter evidence
+
+For title-matching Greenhouse jobs, the collector requests each job's public JSON application-form questions, preserving the response in the raw snapshot. A required or optional cover-letter field is labeled from its actual form metadata. “No field found” means a complete form definition contained no recognizable cover-letter field; it does not mean the application has no written questions. Conflicting or ambiguous description/form wording is “Check details.” Sources without accessible form metadata, failed form lookups and older snapshots are “Unknown” unless the job description mentions a cover letter, in which case they say “Check details.” Never infer that a cover letter is optional from missing information. The filter can show optional fields and forms with no field together. A form may change after the daily check, and the actual application always controls.
+
+Lever's public postings API does not expose custom application questions; the public Ashby job-board API, Workday listing and UKG listing do not provide the complete application form used here. No application HTML, candidate information, credentials or submissions are collected.
 
 ## Repository map
 
