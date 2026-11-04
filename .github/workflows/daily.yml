@@ -25,11 +25,11 @@ jobs:
           git add data/raw data/history.csv data/status.json
           git diff --cached --quiet || git commit -m "Daily snapshot $(date -u +%F)"
           git push
-      - run: python issues.py
-        env:
-          GH_TOKEN: ${{ github.token }}
       # Commits made with GITHUB_TOKEN do not trigger push workflows.
       - run: gh workflow run test.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: python issues.py
         env:
           GH_TOKEN: ${{ github.token }}
       - run: gh workflow run pages.yml --ref main
