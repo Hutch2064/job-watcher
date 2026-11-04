@@ -176,6 +176,12 @@ def test_cover_letter_evidence_from_form_and_description():
     assert watcher.cover_letter_assessment('',None)[0]=='unknown'
     assert watcher.cover_letter_assessment('Please submit a cover letter.',form(False))[0]=='review'
     assert watcher.cover_letter_assessment('Please submit a cover letter.',None)[0]=='review'
+    assert watcher.cover_letter_assessment('A cover letter is required.',None)[0]=='required'
+    assert watcher.cover_letter_assessment('Cover letters are required.',None)[0]=='required'
+    assert watcher.cover_letter_assessment('No cover letter is required.',None)[0]=='optional'
+    assert watcher.cover_letter_assessment('A cover letter is required.',form(False))[0]=='review'
+    assert watcher.cover_letter_assessment('A cover letter is optional.',form(True))[0]=='review'
+    assert watcher.cover_letter_assessment('A cover letter is required if you are applying from abroad.',None)[0]=='review'
     combo={'questions':base+[{'label':'Upload resume or cover letter','required':True,'fields':[{'name':'question_1','type':'input_file'}]}]}
     assert watcher.cover_letter_assessment('',combo)[0]=='review'
     combined_desc={'questions':base+[{'label':'Resume','description':'Attach a cover letter in the same file','required':True,'fields':[{'name':'resume','type':'input_file'}]}]}

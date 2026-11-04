@@ -59,16 +59,28 @@ def duty_excerpt(description):
         (preferred if active else fallback).append(excerpt)
     return next(iter(preferred or fallback), '')
 
-COVER_TERM = re.compile(r'\b(?:cover(?:ing)?[\s-]*letter|cover[\s-]*note|motivation(?:al)?[\s-]*letter|letter of (?:motivation|interest))\b', re.I)
+COVER_TERM = re.compile(r'\b(?:cover(?:ing)?[\s-]*letters?|cover[\s-]*notes?|motivation(?:al)?[\s-]*letters?|letters? of (?:motivation|interest))\b', re.I)
 
 def cover_letter_assessment(description, form=None):
     # A job description or form can change. Only describe the evidence actually observed.
     mentions = [line.strip() for line in plain_text(description).splitlines() if COVER_TERM.search(line)]
-    if not isinstance(form, dict) or not isinstance(form.get('questions'), list):
+    def description_status():
+        # Only explicit statements count; generic mentions require review.
+        for line in mentions:
+            for sentence in re.split(r'(?<=[.!?])\s+', line):
+                if not COVER_TERM.search(sentence): continue
+                if re.search(r'\b(if|unless|where applicable|when applicable|depending on|if applicable)\b', sentence, re.I):
+                    return ('review', 'Job description makes the cover letter conditional')
+                if re.search(r'\b(?:no|without)\s+(?:a\s+)?cover(?:ing)?[\s-]*letters?\b|\bcover(?:ing)?[\s-]*letters?\b.{0,45}\b(?:not required|optional|not necessary)\b', sentence, re.I):
+                    return ('optional', 'Job description says a cover letter is optional')
+                if re.search(r'\bcover(?:ing)?[\s-]*letters?\b.{0,45}\b(?:required|mandatory)\b|\b(?:must|requires?|required to)\b.{0,65}\bcover(?:ing)?[\s-]*letters?\b', sentence, re.I):
+                    return ('required', 'Job description says a cover letter is required')
         return ('review', 'Description mentions a cover letter; check the application') if mentions else ('unknown', 'Application form not checked')
+    described = description_status()
+    if not isinstance(form, dict) or not isinstance(form.get('questions'), list): return described
     field_names = {str(field.get('name') or '') for question in form['questions'] if isinstance(question,dict) for field in (question.get('fields') or []) if isinstance(field,dict)}
     if not {'first_name', 'email'}.issubset(field_names):
-        return ('review', 'Description mentions a cover letter; check the application') if mentions else ('unknown', 'Application form incomplete or unavailable')
+        return described if mentions else ('unknown', 'Application form incomplete or unavailable')
     matches = []
     for question in form['questions']:
         if not isinstance(question, dict): continue
@@ -78,6 +90,8 @@ def cover_letter_assessment(description, form=None):
         fields = question.get('fields') or []
         names = ' '.join(str(x.get('name') or '') for x in fields if isinstance(x, dict))
         if not COVER_TERM.search(label_and_description) and not re.search(r'cover_?letter', names, re.I): continue
+        if re.search(r'\b(if|unless|where applicable|when applicable|depending on|if applicable)\b', label_and_description, re.I):
+            return ('review', 'Application form makes the cover letter conditional')
         types = {str(x.get('type') or '') for x in fields if isinstance(x,dict)}
         combined = bool(re.search(r'\b(resume|r[eé]sum[eé]|cv)\b', label_and_description, re.I)) or bool(re.search(r'\bresume\b', names, re.I))
         if combined or not types.intersection({'input_file','textarea','input_text'}):
@@ -85,12 +99,15 @@ def cover_letter_assessment(description, form=None):
         required = question.get('required')
         if required not in (True,False): return ('review', 'Application form mentions a cover letter; check the field')
         matches.append(required)
-    if any(matches): return ('required', 'Required field in employer application form')
+    if any(matches):
+        if described[0] == 'optional': return ('review', 'Form and job description disagree; check the application')
+        return ('required', 'Required field in employer application form')
     if matches:
-        if mentions and re.search(r'\b(required|must|mandatory|please (?:submit|include|provide|attach))\b', ' '.join(mentions), re.I) and not re.search(r'\b(optional|not required|not necessary)\b', ' '.join(mentions), re.I):
-            return ('review', 'Form says optional but description mentions a requirement')
+        if described[0] == 'required': return ('review', 'Form says optional but job description says required')
+        if mentions and re.search(r'\bplease (?:submit|include|provide|attach)\b', ' '.join(mentions), re.I) and described[0] != 'optional':
+            return ('review', 'Form says optional but description requests a cover letter')
         return ('optional', 'Optional field in employer application form')
-    if mentions: return ('review', 'Description mentions a cover letter; check the application')
+    if mentions: return described
     return ('not_listed', 'No cover-letter field found in the employer form')
 
 SENIOR = re.compile(r'\b(senior|sr\.?|staff|lead|principal|director|vice president|avp|vp|svp|evp|head of|chief|partner|managing director)\b', re.I)
