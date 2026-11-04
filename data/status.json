@@ -1,15 +1,20 @@
 {
-  "run_time": "2026-11-03T19:34:49.129329Z",
+  "run_time": "2026-11-04T02:18:38.874634Z",
   "first_run_date": "2026-11-02",
-  "days_with_success": 2,
-  "open": 4513,
-  "new_today": 153,
-  "removed_today": 121,
+  "days_with_success": 3,
+  "successful_dates": [
+    "2026-11-02",
+    "2026-11-03",
+    "2026-11-04"
+  ],
+  "open": 5172,
+  "new_today": 33,
+  "removed_today": 22,
   "sources": [
     {
       "name": "BlackRock",
       "ok": true,
-      "count": 253
+      "count": 258
     },
     {
       "name": "Invesco",
@@ -19,32 +24,33 @@
     {
       "name": "Fidelity",
       "ok": true,
-      "count": 809
+      "count": 811
     },
     {
       "name": "Dimensional",
       "ok": true,
-      "count": 74
+      "count": 75
     },
     {
       "name": "T. Rowe Price",
       "ok": true,
-      "count": 134
+      "count": 135
     },
     {
       "name": "State Street",
-      "ok": true,
-      "count": 1140
+      "ok": false,
+      "count": 0,
+      "error": "Workday posting has no external path"
     },
     {
       "name": "Vanguard",
       "ok": true,
-      "count": 346
+      "count": 343
     },
     {
       "name": "Apollo",
       "ok": true,
-      "count": 53
+      "count": 54
     },
     {
       "name": "Millennium",
@@ -54,12 +60,12 @@
     {
       "name": "Point72",
       "ok": true,
-      "count": 197
+      "count": 198
     },
     {
       "name": "Bridgewater Associates",
       "ok": true,
-      "count": 21
+      "count": 22
     },
     {
       "name": "Connor, Clark & Lunn",
@@ -69,12 +75,12 @@
     {
       "name": "TPG",
       "ok": true,
-      "count": 18
+      "count": 19
     },
     {
       "name": "Jane Street",
       "ok": true,
-      "count": 217
+      "count": 219
     },
     {
       "name": "Betterment",
@@ -99,33 +105,32 @@
     {
       "name": "Thrivent",
       "ok": true,
-      "count": 310
+      "count": 312
     },
     {
       "name": "Neuberger Berman",
       "ok": true,
-      "count": 92
+      "count": 91
     },
     {
       "name": "AllianceBernstein",
       "ok": true,
-      "count": 88
+      "count": 86
     },
     {
       "name": "Hartford",
       "ok": true,
-      "count": 232
+      "count": 231
     },
     {
       "name": "Northern Trust",
-      "ok": false,
-      "count": 0,
-      "error": "'title'"
+      "ok": true,
+      "count": 645
     },
     {
       "name": "TIAA / Nuveen",
       "ok": true,
-      "count": 152
+      "count": 156
     },
     {
       "name": "GMO",
