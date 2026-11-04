@@ -28,6 +28,10 @@ jobs:
       - run: python issues.py
         env:
           GH_TOKEN: ${{ github.token }}
+      # Commits made with GITHUB_TOKEN do not trigger push workflows.
+      - run: gh workflow run test.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: gh workflow run pages.yml --ref main
         env:
           GH_TOKEN: ${{ github.token }}

@@ -3,18 +3,18 @@ import csv
 import json
 import os
 import subprocess
-from datetime import datetime, timezone, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 root = Path(__file__).resolve().parent
 repo = os.environ['GITHUB_REPOSITORY']
-today = datetime.now(timezone.utc).date()
+status = json.loads((root/'data/status.json').read_text())
+today = date.fromisoformat(status['run_time'][:10])
 def api(*args):
     return json.loads(subprocess.check_output(['gh','api',*args], text=True))
 def title(date): return f'Job Watcher — {date.isoformat()}'
 issues = api(f'repos/{repo}/issues?state=all&per_page=100')
 with (root/'data/history.csv').open(encoding='utf-8', newline='') as f: rows=list(csv.DictReader(f))
-status=json.loads((root/'data/status.json').read_text())
 def listing(rows):
     return '\n'.join(f"- [{r['title'].replace('[','(').replace(']',')')}]({r['url']}) — {r['employer']} · {r['location']}" for r in rows) or '_None._'
 new=[r for r in rows if r['first_seen']==str(today) and r['first_run']=='false']

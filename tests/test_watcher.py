@@ -85,3 +85,53 @@ def test_reported_internships_are_early_not_international():
         assert watcher.experience_level(title) == ('early', 'Internship in title')
     for title in ['International Investment Analyst', 'Internal Investment Analyst']:
         assert watcher.experience_level(title)[0] != 'early'
+
+def test_workday_recovers_missing_listing_title_without_changing_raw(monkeypatch):
+    source = {'id':'w','name':'W','type':'workday','host':'test.wd1','board':'External'}
+    path = '/job/New-York/Analyst_R-42'
+    listing = {'externalPath':path, 'locationsText':'New York'}
+    def request(url, payload=None):
+        if payload is not None:
+            return {'total':1, 'jobPostings':[listing]}
+        return {'jobPostingInfo':{'title':'Portfolio Analyst','jobDescription':'1 year of investment experience'}}
+    monkeypatch.setattr(watcher,'request',request)
+    raw = watcher.fetch(source)
+    assert 'title' not in raw['pages'][0]['jobPostings'][0]
+    assert raw['recovered_titles'][path] == 'Portfolio Analyst'
+    row = watcher.normalize(source,raw)[0]
+    assert row['posting_id'] == 'w:R-42' and row['title'] == 'Portfolio Analyst'
+    assert row['in_role'] == 'true' and row['experience'] == 'early'
+
+def test_workday_rejects_unrecoverable_title(monkeypatch):
+    import pytest
+    source = {'id':'w','name':'W','type':'workday','host':'test.wd1','board':'External'}
+    def request(url, payload=None):
+        return {'total':1,'jobPostings':[{'externalPath':'/job/X_R-1'}]} if payload is not None else {'jobPostingInfo':{}}
+    monkeypatch.setattr(watcher,'request',request)
+    with pytest.raises(ValueError, match='no recoverable title'):
+        watcher.fetch(source)
+
+def test_same_day_rerun_failure_removes_only_that_sources_raw(tmp_path, monkeypatch):
+    from datetime import datetime, timezone
+    class Clock:
+        @classmethod
+        def now(cls, tz): return datetime(2026, 2, 3, 15, tzinfo=timezone.utc)
+    sources = [{'id':'a','name':'A','type':'greenhouse'}, {'id':'b','name':'B','type':'greenhouse'}]
+    monkeypatch.setattr(watcher, 'ROOT', tmp_path)
+    monkeypatch.setattr(watcher, 'SOURCES', sources)
+    monkeypatch.setattr(watcher, 'datetime', Clock)
+    failures = set()
+    def fetch(source):
+        if source['id'] in failures: raise ValueError('source unavailable')
+        payload = {'jobs':[{'id':1, 'title':'Investment Analyst', 'absolute_url':'https://example.com/1'}]}
+        return payload, watcher.normalize(source,payload)
+    monkeypatch.setattr(watcher,'fetch_validated',fetch)
+    watcher.collect()
+    folder=tmp_path/'data/raw/2026-02-03'
+    assert (folder/'a.json.gz').exists() and (folder/'b.json.gz').exists()
+    failures.add('a')
+    watcher.collect()
+    status=json.loads((tmp_path/'data/status.json').read_text())
+    assert not (folder/'a.json.gz').exists() and (folder/'b.json.gz').exists()
+    assert status['days_with_success']==1 and status['successful_dates']==['2026-02-03']
+    assert status['open']==1 and status['sources'][0]['ok'] is False

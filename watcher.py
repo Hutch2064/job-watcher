@@ -97,8 +97,22 @@ def fetch(source):
         if (page['total'] not in (0, total)) or (offset < total and not page['jobPostings']): raise ValueError('Incomplete or changing pagination')
         pages.append(page); offset += len(page['jobPostings'])
         if total == 0: break
+    # Some Workday listings omit a title. Recover it from the public JSON detail,
+    # retaining the original page unchanged; fail the board if recovery is impossible.
+    recovered_titles = {}
+    for page in pages:
+        for job in page['jobPostings']:
+            if not job.get('externalPath'):
+                raise ValueError('Workday posting has no external path')
+            if not job.get('title'):
+                path = job['externalPath']
+                detail_url = f"https://{source['host']}.myworkdayjobs.com/wday/cxs/{source['host'].split('.')[0]}/{board}{path}"
+                info = request(detail_url).get('jobPostingInfo', {})
+                title = info.get('title')
+                if not title: raise ValueError(f'Workday posting has no recoverable title: {path}')
+                recovered_titles[path] = title
     # Detail lookups enrich relevant roles without jeopardizing the complete board snapshot.
-    postings = [j for page in pages for j in page['jobPostings'] if in_role(j['title']) and not SENIOR.search(j['title'])]
+    postings = [j for page in pages for j in page['jobPostings'] if in_role(j.get('title') or recovered_titles[j['externalPath']]) and not SENIOR.search(j.get('title') or recovered_titles[j['externalPath']])]
     def detail(job):
         try:
             url = f"https://{source['host']}.myworkdayjobs.com/wday/cxs/{source['host'].split('.')[0]}/{board}{job['externalPath']}"
@@ -108,7 +122,7 @@ def fetch(source):
             return job['externalPath'], ''
     with ThreadPoolExecutor(max_workers=4) as pool:
         details = dict(pool.map(detail, postings))
-    return {'pages':pages, 'details':details}
+    return {'pages':pages, 'details':details, 'recovered_titles':recovered_titles}
 
 def normalize(source, data):
     kind = source['type']; rows = []
@@ -122,7 +136,8 @@ def normalize(source, data):
             sid = str(j['id']); cat = j.get('categories') or {}; loc = cat.get('location',''); dep = cat.get('department') or cat.get('team') or ''; url = j['hostedUrl']; posted = datetime.fromtimestamp(j['createdAt']/1000, timezone.utc).date().isoformat() if j.get('createdAt') else ''
         else:
             path = j['externalPath']; sid = path.rsplit('_',1)[-1]; loc = j.get('locationsText',''); dep = ''; posted = ''; url = f"https://{source['host']}.myworkdayjobs.com/en-US/{source['board']}{path}"
-        title = j['text'] if kind == 'lever' else j['title']
+        title = j['text'] if kind == 'lever' else (j.get('title') or data.get('recovered_titles', {}).get(j.get('externalPath', '')) if kind == 'workday' else j['title'])
+        if not title: raise ValueError('Posting title unavailable')
         if kind == 'greenhouse': description = j.get('content', '')
         elif kind == 'lever':
             description = ' '.join([j.get('descriptionPlain') or j.get('description') or '', j.get('additionalPlain') or j.get('additional') or ''] + [x.get('text', '') + ' ' + (x.get('content') or '') for x in j.get('lists', [])])
@@ -178,7 +193,7 @@ def collect():
     with ThreadPoolExecutor(max_workers=5) as pool:
         results = list(pool.map(collect_one, SOURCES))
     history, dates = build(); rows = list(history.values())
-    status = {'run_time':now.isoformat().replace('+00:00','Z'), 'first_run_date':min(dates) if dates else '', 'days_with_success':len(dates), 'open':sum(r['status']=='open' for r in rows), 'new_today':sum(r['first_seen']==date and r['first_run']=='false' for r in rows), 'removed_today':sum(r['removed_date']==date for r in rows), 'sources':results}
+    status = {'run_time':now.isoformat().replace('+00:00','Z'), 'first_run_date':min(dates) if dates else '', 'days_with_success':len(dates), 'successful_dates':sorted(dates), 'open':sum(r['status']=='open' for r in rows), 'new_today':sum(r['first_seen']==date and r['first_run']=='false' for r in rows), 'removed_today':sum(r['removed_date']==date for r in rows), 'sources':results}
     (ROOT/'data/status.json').write_text(json.dumps(status, indent=2)+'\n')
     if not dates: raise RuntimeError('No source produced a raw file')
 
