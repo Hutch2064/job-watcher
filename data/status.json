@@ -1,5 +1,5 @@
 {
-  "run_time": "2026-11-04T02:18:38.874634Z",
+  "run_time": "2026-11-04T02:45:11.007652Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 3,
   "successful_dates": [
@@ -7,9 +7,9 @@
     "2026-11-03",
     "2026-11-04"
   ],
-  "open": 5172,
-  "new_today": 33,
-  "removed_today": 22,
+  "open": 8492,
+  "new_today": 40,
+  "removed_today": 26,
   "sources": [
     {
       "name": "BlackRock",
@@ -38,9 +38,8 @@
     },
     {
       "name": "State Street",
-      "ok": false,
-      "count": 0,
-      "error": "Workday posting has no external path"
+      "ok": true,
+      "count": 1143
     },
     {
       "name": "Vanguard",
@@ -125,7 +124,7 @@
     {
       "name": "Northern Trust",
       "ok": true,
-      "count": 645
+      "count": 646
     },
     {
       "name": "TIAA / Nuveen",
@@ -146,6 +145,186 @@
       "name": "Avantis Investors",
       "ok": true,
       "count": 2
+    },
+    {
+      "name": "Capital Group",
+      "ok": true,
+      "count": 173
+    },
+    {
+      "name": "PIMCO",
+      "ok": true,
+      "count": 172
+    },
+    {
+      "name": "Wellington Management",
+      "ok": true,
+      "count": 115
+    },
+    {
+      "name": "Russell Investments",
+      "ok": true,
+      "count": 37
+    },
+    {
+      "name": "Fiera Capital",
+      "ok": true,
+      "count": 11
+    },
+    {
+      "name": "PGIM / Prudential",
+      "ok": true,
+      "count": 189
+    },
+    {
+      "name": "Texas Permanent School Fund",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "Ontario Teachers Pension Plan",
+      "ok": true,
+      "count": 34
+    },
+    {
+      "name": "Ares Management",
+      "ok": true,
+      "count": 233
+    },
+    {
+      "name": "Manulife",
+      "ok": true,
+      "count": 567
+    },
+    {
+      "name": "Cambridge Associates",
+      "ok": true,
+      "count": 43
+    },
+    {
+      "name": "BMO",
+      "ok": true,
+      "count": 973
+    },
+    {
+      "name": "Athora",
+      "ok": true,
+      "count": 3
+    },
+    {
+      "name": "Jupiter Asset Management",
+      "ok": true,
+      "count": 12
+    },
+    {
+      "name": "New York State Teachers Retirement System",
+      "ok": true,
+      "count": 3
+    },
+    {
+      "name": "CAAT Pension Plan",
+      "ok": true,
+      "count": 16
+    },
+    {
+      "name": "Brookfield",
+      "ok": true,
+      "count": 137
+    },
+    {
+      "name": "ICONIQ",
+      "ok": true,
+      "count": 16
+    },
+    {
+      "name": "Vise",
+      "ok": true,
+      "count": 11
+    },
+    {
+      "name": "Forteus / Numeus",
+      "ok": true,
+      "count": 1
+    },
+    {
+      "name": "Choreo",
+      "ok": true,
+      "count": 6
+    },
+    {
+      "name": "Star Mountain Capital",
+      "ok": true,
+      "count": 11
+    },
+    {
+      "name": "CAIS",
+      "ok": true,
+      "count": 13
+    },
+    {
+      "name": "CC&L Quantitative",
+      "ok": true,
+      "count": 8
+    },
+    {
+      "name": "Galvanize",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "Mercer Advisors",
+      "ok": true,
+      "count": 95
+    },
+    {
+      "name": "iCapital",
+      "ok": true,
+      "count": 212
+    },
+    {
+      "name": "WisdomTree US",
+      "ok": true,
+      "count": 2
+    },
+    {
+      "name": "EP Wealth Advisors",
+      "ok": true,
+      "count": 37
+    },
+    {
+      "name": "Wealthfront",
+      "ok": true,
+      "count": 23
+    },
+    {
+      "name": "Global X ETFs",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "Range",
+      "ok": true,
+      "count": 65
+    },
+    {
+      "name": "Compound Planning",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "Calamos Investments",
+      "ok": true,
+      "count": 15
+    },
+    {
+      "name": "VanEck",
+      "ok": true,
+      "count": 41
+    },
+    {
+      "name": "American Century Investments",
+      "ok": true,
+      "count": 22
     }
   ]
 }
