@@ -1,20 +1,47 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#101c19">
-  <meta name="description" content="An investment career job watcher">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=9">
-  <title>Market | Fieldnote Jobs</title>
-</head>
-<body>
-<a class="skip" href="#content">Skip to content</a>
-<header><nav><a class="brand" href="index.html"><img src="icon.svg" alt="" width="30" height="30"> Fieldnote Jobs</a><a href="index.html">Today</a><a href="browse.html">Browse</a><a href="market.html" aria-current="page">Market</a></nav></header>
-<main id="content"><p id="offline" class="offline" hidden></p><div class="page-head"><h1>Market overview.</h1><p id="asof" class="muted">Loading history…</p></div><div id="market"><div class="skeleton placeholder"></div></div><footer class="footer">Fieldnote Jobs · Openings and title matches should be verified with the employer.</footer></main>
-<script type="module" src="market.js?v=9"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101c19" />
+    <meta name="description" content="An investment career job watcher" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <link rel="stylesheet" href="style.css?v=10" />
+    <title>Market | Fieldnote Jobs</title>
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to content</a>
+    <header>
+      <nav>
+        <a class="brand" href="index.html"
+          ><img src="icon.svg" alt="" width="30" height="30" /> Fieldnote
+          Jobs</a
+        ><a href="index.html">Today</a><a href="browse.html">Browse</a
+        ><a href="market.html" aria-current="page">Market</a>
+      </nav>
+    </header>
+    <main id="content">
+      <p id="offline" class="offline" hidden></p>
+      <div class="page-head">
+        <h1>Market overview.</h1>
+        <p id="asof" class="muted">Loading history…</p>
+      </div>
+      <div class="toggles" role="group" aria-label="Market scope">
+        <button id="market-all" aria-pressed="true">All postings</button
+        ><button id="market-role" aria-pressed="false">Your role</button>
+      </div>
+      <div id="market"><div class="skeleton placeholder"></div></div>
+      <footer class="footer">
+        Fieldnote Jobs · Openings and title matches should be verified with the
+        employer. <a href="methods.html">Methods</a> ·
+        <a href="data/feed.xml">RSS</a>
+      </footer>
+    </main>
+    <script type="module" src="market.js?v=10"></script>
+  </body>
 </html>

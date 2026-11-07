@@ -11,3 +11,11 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pytest -q
       - run: node tests/frontend.mjs
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Browser smoke and offline test
+        run: |
+          python -m http.server 8765 > /tmp/job-watcher-server.log 2>&1 &
+          node tests/browser.mjs

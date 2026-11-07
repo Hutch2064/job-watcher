@@ -1,20 +1,123 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#101c19">
-  <meta name="description" content="An investment career job watcher">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=9">
-  <title>Browse | Fieldnote Jobs</title>
-</head>
-<body>
-<a class="skip" href="#content">Skip to content</a>
-<header><nav><a class="brand" href="index.html"><img src="icon.svg" alt="" width="30" height="30"> Fieldnote Jobs</a><a href="index.html">Today</a><a href="browse.html" aria-current="page">Browse</a><a href="market.html">Market</a></nav></header>
-<main id="content"><p id="offline" class="offline" hidden></p><div class="page-head"><h1>Browse jobs.</h1><p class="muted">Explore investment roles and save the ones you like.</p></div><div class="toggles" role="group" aria-label="Job view"><button id="role" aria-pressed="true">Your role</button><button id="all" aria-pressed="false">All postings</button><button id="shortlist" aria-pressed="false">★ Shortlist <span id="star-count">0</span></button></div><div class="filters primary-filters"><label>Search titles<input id="search" type="search" placeholder="Portfolio analyst"></label><label>Location<input id="location" type="search" placeholder="City, state or remote" list="location-options"><datalist id="location-options"></datalist></label><label>Experience<select id="experience"><option value="suitable">Early career + review</option><option value="early">Early career</option><option value="unknown">Needs review</option><option value="experienced">More experienced</option><option value="all">All experience levels</option></select></label></div><details id="more-filters"><summary>More filters</summary><div class="filters"><label>Employer<select id="employer"><option value="">All employers</option></select></label><label>Cover letter<select id="cover-letter"><option value="all">Any status</option><option value="required">Required</option><option value="optional">Optional or no field found</option></select></label><label>Days observed<select id="days"><option value="">Any time</option><option value="7">Last 7 days</option><option value="14">Last 14 days</option><option value="30">Last 30 days</option></select></label><label>Sort by first seen<select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label></div><p class="muted">Experience and cover-letter labels are signals from available source information. Check each employer’s application for full requirements.</p></details><div class="result-line"><p id="result-count" aria-live="polite">Loading…</p><button id="clear" class="text-button">Clear all</button></div><div id="chips" class="chips"></div><div id="jobs" class="job-list"><div class="skeleton placeholder"></div></div><button id="more" hidden>Show more</button><div id="toast" role="status" hidden></div><footer class="footer">Fieldnote Jobs · Openings and title matches should be verified with the employer.</footer></main>
-<script type="module" src="browse.js?v=9"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101c19" />
+    <meta name="description" content="An investment career job watcher" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <link rel="stylesheet" href="style.css?v=10" />
+    <title>Browse | Fieldnote Jobs</title>
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to content</a>
+    <header>
+      <nav>
+        <a class="brand" href="index.html"
+          ><img src="icon.svg" alt="" width="30" height="30" /> Fieldnote
+          Jobs</a
+        ><a href="index.html">Today</a
+        ><a href="browse.html" aria-current="page">Browse</a
+        ><a href="market.html">Market</a>
+      </nav>
+    </header>
+    <main id="content">
+      <p id="offline" class="offline" hidden></p>
+      <div class="page-head">
+        <h1>Browse jobs.</h1>
+        <p class="muted">
+          Explore investment roles and save the ones you like.
+        </p>
+      </div>
+      <div class="toggles" role="group" aria-label="Job view">
+        <button id="role" aria-pressed="true">Your role</button
+        ><button id="all" aria-pressed="false">All postings</button
+        ><button id="shortlist" aria-pressed="false">
+          ★ Shortlist <span id="star-count">0</span>
+        </button>
+      </div>
+      <div class="filters primary-filters">
+        <label
+          >Search titles<input
+            id="search"
+            type="search"
+            placeholder="Portfolio analyst" /></label
+        ><label
+          >Location<input
+            id="location"
+            type="search"
+            placeholder="City, state or remote"
+            list="location-options" /><datalist
+            id="location-options"
+          ></datalist></label
+        ><label
+          >Experience<select id="experience">
+            <option value="suitable">Early career + review</option>
+            <option value="early">Early career</option>
+            <option value="unknown">Needs review</option>
+            <option value="experienced">More experienced</option>
+            <option value="all">All experience levels</option>
+          </select></label
+        >
+      </div>
+      <details id="more-filters">
+        <summary>More filters</summary>
+        <div class="filters">
+          <label
+            >Employer<select id="employer">
+              <option value="">All employers</option>
+            </select></label
+          ><label
+            >Cover letter<select id="cover-letter">
+              <option value="all">Any status</option>
+              <option value="required">Required</option>
+              <option value="optional">Optional or no field found</option>
+            </select></label
+          ><label
+            >Days observed<select id="days">
+              <option value="">Any time</option>
+              <option value="7">Last 7 days</option>
+              <option value="14">Last 14 days</option>
+              <option value="30">Last 30 days</option>
+            </select></label
+          ><label
+            >Sort by first seen<select id="sort">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select></label
+          >
+        </div>
+        <p class="muted">
+          Experience and cover-letter labels are signals from available source
+          information. Check each employer’s application for full requirements.
+        </p>
+      </details>
+      <div class="result-line">
+        <p id="result-count" aria-live="polite">Loading…</p>
+        <button id="clear" class="text-button">Clear all</button>
+      </div>
+      <div id="chips" class="chips"></div>
+      <div id="shortlist-actions" hidden>
+        <button id="export-shortlist">Export shortlist CSV</button>
+        <button id="print-shortlist">Print shortlist</button>
+        <p class="muted">Statuses and notes are stored on this device.</p>
+      </div>
+      <div id="jobs" class="job-list">
+        <div class="skeleton placeholder"></div>
+      </div>
+      <button id="more" hidden>Show more</button>
+      <div id="toast" role="status" hidden></div>
+      <footer class="footer">
+        Fieldnote Jobs · Openings and title matches should be verified with the
+        employer. <a href="methods.html">Methods</a> ·
+        <a href="data/feed.xml">RSS</a>
+      </footer>
+    </main>
+    <script type="module" src="browse.js?v=10"></script>
+  </body>
 </html>

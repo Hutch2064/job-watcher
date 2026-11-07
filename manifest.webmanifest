@@ -25,5 +25,29 @@
       "purpose": "any maskable"
     }
   ],
-  "id": "./"
+  "id": "./",
+  "shortcuts": [
+    {
+      "name": "Browse jobs",
+      "short_name": "Browse",
+      "url": "browse.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Shortlist",
+      "short_name": "Shortlist",
+      "url": "browse.html?mode=shortlist",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

@@ -10,6 +10,8 @@ Public ATS JSON → daily raw snapshots → deterministic history and status
                                       ↘ GitHub issue and Pages site
 ```
 
+See the [Methods page](https://hutch2064.github.io/job-watcher/methods.html) for a plain-language explanation and subscribe to the [new-role RSS feed](https://hutch2064.github.io/job-watcher/data/feed.xml).
+
 ## Sources
 
 `sources.json` is the authoritative configuration. The watchlist has the following public JSON boards; the status on Today shows the result of the latest check. BlackRock includes iShares; Dimensional includes DFA. WisdomTree UK is its UK Lever board, not a claim to cover every WisdomTree location. State Street's board includes the wider company alongside its investment business. The same applies to other diversified firms. An employer can legitimately have zero openings. No configured board is filtered by a search term. A board exceeding 5,000 postings fails validation rather than being truncated. Workday responses reporting exactly 2,000 are also rejected because that can be a capped result.
@@ -133,3 +135,5 @@ Lever's public postings API does not expose custom application questions; the pu
 | `.gitignore`, `README.md`, `SOURCE_REVIEW.md`, `SUBMISSION.txt` | Local exclusions, documentation, source review and four-line submission. |
 
 Raw snapshots grow over time (approximately 3 MB per day in the initial week). For longer-term operation, older raw files could move to versioned release assets while retaining a reproducible archive. Millennium’s zero-result Workday feed is inactive pending validation of its current careers feed.
+
+A source that falls below half its previous good count is marked suspect, preserving the last snapshot. After confirming a genuine drop at the employer, set `accept_count_drop: true` on that source for one collection, then remove the override. The observed-date list in source health records saved snapshots; an absent date does not by itself prove an attempted check failed.
