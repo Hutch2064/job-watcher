@@ -743,6 +743,7 @@ def test_feed_excludes_initial_snapshot_and_escapes_text(tmp_path, monkeypatch):
     items = ElementTree.parse(tmp_path / "data/feed.xml").findall("./channel/item")
     assert len(items) == 1
     assert items[0].findtext("title") == "Research & Analysis — Firm"
+    assert items[0].find("guid").get("isPermaLink") == "false"
 
 
 def test_retry_after_header_is_respected():

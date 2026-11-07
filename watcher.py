@@ -896,7 +896,10 @@ def write_feed(rows, run_time):
             ("guid", row["posting_id"]),
             ("description", row["location"] + " · First observed " + row["first_seen"]),
         ]:
-            SubElement(item, key).text = value
+            element = SubElement(item, key)
+            if key == "guid":
+                element.set("isPermaLink", "false")
+            element.text = value
     ElementTree(rss).write(
         ROOT / "data/feed.xml", encoding="utf-8", xml_declaration=True
     )
