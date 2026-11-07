@@ -6,7 +6,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=11";
+} from "./common.js?v=12";
 try {
   const { status, rows } = await load();
   const date = status.run_time.slice(0, 10);
@@ -14,7 +14,9 @@ try {
     (row) => row.first_seen === date && row.first_run === "false",
   );
   const removed = rows.filter((row) => row.removed_date === date);
-  const relevant = added.filter((row) => row.in_role === "true");
+  const relevant = added.filter(
+    (row) => row.in_role === "true" && row.experience !== "experienced",
+  );
   const early = relevant.filter((row) => row.experience === "early");
   const saved = stars();
   const previousVisit = localStorage.getItem("fieldnote-last-visit");
@@ -23,6 +25,7 @@ try {
         (row) =>
           row.status === "open" &&
           row.in_role === "true" &&
+          row.experience !== "experienced" &&
           row.first_run === "false" &&
           row.first_seen > previousVisit.slice(0, 10),
       ).length
@@ -47,7 +50,7 @@ try {
     )
     .join("");
   $("#brief").textContent =
-    `${number(relevant.length)} new postings match your role today; ${number(early.length)} show an early-career signal.` +
+    `${number(relevant.length)} new postings match your role and early-career filter today; ${number(early.length)} show an early-career signal.` +
     (previousVisit
       ? ` ${number(sinceVisit)} appeared after your last visit’s UTC date.`
       : "");
