@@ -1,52 +1,53 @@
 {
-  "run_time": "2026-11-06T19:29:46.711078Z",
+  "run_time": "2026-11-07T17:46:18.067601Z",
   "first_run_date": "2026-11-02",
-  "days_with_success": 5,
+  "days_with_success": 6,
   "successful_dates": [
     "2026-11-02",
     "2026-11-03",
     "2026-11-04",
     "2026-11-05",
-    "2026-11-06"
+    "2026-11-06",
+    "2026-11-07"
   ],
-  "open": 8753,
-  "new_today": 153,
-  "removed_today": 171,
+  "open": 8747,
+  "new_today": 187,
+  "removed_today": 197,
   "sources": [
     {
       "name": "BlackRock",
       "ok": true,
-      "count": 274
+      "count": 275
     },
     {
       "name": "Invesco",
       "ok": true,
-      "count": 214
+      "count": 215
     },
     {
       "name": "Fidelity",
       "ok": true,
-      "count": 852
+      "count": 855
     },
     {
       "name": "Dimensional",
       "ok": true,
-      "count": 71
+      "count": 72
     },
     {
       "name": "T. Rowe Price",
       "ok": true,
-      "count": 134
+      "count": 135
     },
     {
       "name": "State Street",
       "ok": true,
-      "count": 1187
+      "count": 1185
     },
     {
       "name": "Vanguard",
       "ok": true,
-      "count": 348
+      "count": 341
     },
     {
       "name": "Apollo",
@@ -61,7 +62,7 @@
     {
       "name": "Point72",
       "ok": true,
-      "count": 200
+      "count": 201
     },
     {
       "name": "Bridgewater Associates",
@@ -106,13 +107,12 @@
     {
       "name": "Thrivent",
       "ok": true,
-      "count": 317
+      "count": 316
     },
     {
       "name": "Neuberger Berman",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 403: Forbidden"
+      "ok": true,
+      "count": 92
     },
     {
       "name": "AllianceBernstein",
@@ -122,18 +122,17 @@
     {
       "name": "Hartford",
       "ok": true,
-      "count": 231
+      "count": 230
     },
     {
       "name": "Northern Trust",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 429: Too Many Requests"
+      "ok": true,
+      "count": 642
     },
     {
       "name": "TIAA / Nuveen",
       "ok": true,
-      "count": 163
+      "count": 165
     },
     {
       "name": "GMO",
@@ -153,12 +152,13 @@
     {
       "name": "Capital Group",
       "ok": true,
-      "count": 178
+      "count": 176
     },
     {
       "name": "PIMCO",
-      "ok": true,
-      "count": 167
+      "ok": false,
+      "count": 0,
+      "error": "HTTP Error 429: Too Many Requests"
     },
     {
       "name": "Wellington Management",
@@ -178,7 +178,7 @@
     {
       "name": "PGIM / Prudential",
       "ok": true,
-      "count": 189
+      "count": 188
     },
     {
       "name": "Texas Permanent School Fund",
@@ -197,9 +197,8 @@
     },
     {
       "name": "Manulife",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 404: Not Found"
+      "ok": true,
+      "count": 618
     },
     {
       "name": "Cambridge Associates",
@@ -208,9 +207,8 @@
     },
     {
       "name": "BMO",
-      "ok": false,
-      "count": 0,
-      "error": "Workday posting has no external path"
+      "ok": true,
+      "count": 1034
     },
     {
       "name": "Athora",
@@ -240,12 +238,13 @@
     {
       "name": "ICONIQ",
       "ok": true,
-      "count": 16
+      "count": 15
     },
     {
       "name": "Vise",
-      "ok": true,
-      "count": 12
+      "ok": false,
+      "count": 0,
+      "error": "HTTP Error 404: Not Found"
     },
     {
       "name": "Forteus / Numeus",
@@ -280,12 +279,12 @@
     {
       "name": "Mercer Advisors",
       "ok": true,
-      "count": 94
+      "count": 96
     },
     {
       "name": "iCapital",
       "ok": true,
-      "count": 222
+      "count": 219
     },
     {
       "name": "WisdomTree US",
@@ -310,7 +309,7 @@
     {
       "name": "Range",
       "ok": true,
-      "count": 65
+      "count": 66
     },
     {
       "name": "Compound Planning",
@@ -330,7 +329,7 @@
     {
       "name": "American Century Investments",
       "ok": true,
-      "count": 20
+      "count": 19
     }
   ]
 }
