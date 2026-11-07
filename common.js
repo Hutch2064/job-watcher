@@ -173,3 +173,12 @@ export function bars(data, type = "") {
 }
 if ("serviceWorker" in navigator)
   navigator.serviceWorker.register("sw.js").catch(console.error);
+
+if (typeof document !== "undefined")
+  document.addEventListener("click", (event) => {
+    if (event.target.closest("a,button,input,select,textarea,summary,details"))
+      return;
+    const card = event.target.closest(".job");
+    if (card && !window.getSelection()?.toString())
+      card.querySelector("h3 a")?.click();
+  });

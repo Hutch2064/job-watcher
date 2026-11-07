@@ -705,3 +705,14 @@ td {
 .removed-column {
   background: var(--removed);
 }
+.job {
+  cursor: pointer;
+}
+.job button,
+.job summary,
+.job select {
+  cursor: pointer;
+}
+.job textarea {
+  cursor: text;
+}
