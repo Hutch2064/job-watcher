@@ -1,5 +1,7 @@
 # Fieldnote Jobs
 
+![Fieldnote Jobs daily briefing](docs/preview.png)
+
 [![Tests](https://github.com/Hutch2064/job-watcher/actions/workflows/test.yml/badge.svg)](https://github.com/Hutch2064/job-watcher/actions/workflows/test.yml)
 
 A daily job watcher for investment research, portfolio construction, allocation, analytics and investment-facing portfolio solutions. [Open the site](https://hutch2064.github.io/job-watcher/). It watches full public employer ATS boards, not job-board HTML or a third-party aggregator. Roles are global; a title match is a discovery aid, not an assessment of eligibility or job duties.
