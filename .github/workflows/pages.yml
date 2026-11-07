@@ -23,6 +23,7 @@ jobs:
         run: |
           mkdir -p _site/data
           cp *.html *.js *.css *.png *.svg manifest.webmanifest _site/
+          cp -R fonts _site/fonts
           cp data/status.json data/history.csv data/feed.xml _site/data/
       - uses: actions/upload-pages-artifact@v3
         with:

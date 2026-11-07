@@ -8,7 +8,7 @@ import {
   normalizeLocation,
   escapeHTML as e,
   showError,
-} from "./common.js?v=17";
+} from "./common.js?v=18";
 
 try {
   const { status, rows } = await load();

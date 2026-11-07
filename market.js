@@ -8,7 +8,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=17";
+} from "./common.js?v=18";
 try {
   const { status, rows: allRows } = await load();
   function render(roleOnly) {
