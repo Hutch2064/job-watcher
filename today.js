@@ -6,7 +6,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=13";
+} from "./common.js?v=14";
 try {
   const { status, rows } = await load();
   const date = status.run_time.slice(0, 10);
@@ -67,7 +67,19 @@ try {
     .sort((a, b) => Number(a.ok) - Number(b.ok) || a.name.localeCompare(b.name))
     .map(
       (source) =>
-        `<div class="source"><strong>${e(source.name)}</strong><span class="${source.ok ? "healthy" : "error"}">${source.ok ? "Checked" : source.suspect ? "Suspect" : "Unavailable"}</span><span>Last successful check: ${e(source.last_success || (source.ok ? date : "Not available"))}</span>${source.error ? `<span>${e(source.error)}</span>` : ""}${source.observed_dates?.length ? `<span title="Dates with saved observations">Observed: ${source.observed_dates.map((date) => e(date.slice(5))).join(" · ")}</span>` : ""}</div>`,
+        `<div class="source"><strong>${e(source.name)}</strong><span class="${source.ok ? "healthy" : "error"}">${source.ok ? "Checked" : source.suspect ? "Suspect" : "Unavailable"}</span><span>Last successful check: ${e(source.last_success || (source.ok ? date : "Not available"))}</span>${source.error ? `<span>${e(source.error)}</span>` : ""}${
+          source.observed_dates
+            ? `<span class="health-strip" aria-label="Saved observations over recent dates">${(
+                status.successful_dates || []
+              )
+                .slice(-14)
+                .map(
+                  (day) =>
+                    `<i class="${source.observed_dates.includes(day) ? "observed" : "unobserved"}" title="${e(day)}: ${source.observed_dates.includes(day) ? "snapshot saved" : "no snapshot on record"}"></i>`,
+                )
+                .join("")}</span>`
+            : ""
+        }</div>`,
     )
     .join("");
   document.addEventListener("click", (event) => {

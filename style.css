@@ -716,3 +716,17 @@ td {
 .job textarea {
   cursor: text;
 }
+.health-strip {
+  display: flex;
+  gap: 4px;
+  padding-top: 4px;
+}
+.health-strip i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: #58645d;
+}
+.health-strip i.observed {
+  background: var(--positive);
+}
