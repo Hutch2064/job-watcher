@@ -6,7 +6,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=18";
+} from "./common.js?v=19";
 try {
   const { status, rows } = await load();
   const date = status.run_time.slice(0, 10);
@@ -91,6 +91,15 @@ try {
     localStorage.setItem("watchlist-stars", JSON.stringify([...saved]));
     button.textContent = saved.has(button.dataset.id) ? "★" : "☆";
     button.setAttribute("aria-pressed", saved.has(button.dataset.id));
+    button.setAttribute(
+      "aria-label",
+      button
+        .getAttribute("aria-label")
+        .replace(
+          /^(Add to|Remove from)/,
+          saved.has(button.dataset.id) ? "Remove from" : "Add to",
+        ),
+    );
     button
       .closest(".job")
       .classList.toggle("saved", saved.has(button.dataset.id));

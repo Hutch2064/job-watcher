@@ -8,7 +8,7 @@ import {
   normalizeLocation,
   escapeHTML as e,
   showError,
-} from "./common.js?v=18";
+} from "./common.js?v=19";
 
 try {
   const { status, rows } = await load();
@@ -294,6 +294,15 @@ try {
     }
     button.textContent = saved.has(id) ? "★" : "☆";
     button.setAttribute("aria-pressed", String(saved.has(id)));
+    button.setAttribute(
+      "aria-label",
+      button
+        .getAttribute("aria-label")
+        .replace(
+          /^(Add to|Remove from)/,
+          saved.has(id) ? "Remove from" : "Add to",
+        ),
+    );
     button.closest(".job").classList.toggle("saved", saved.has(id));
     updateMode();
     if (wasSaved) {
