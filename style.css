@@ -730,3 +730,7 @@ td {
 .health-strip i.observed {
   background: var(--positive);
 }
+#install-app {
+  font-size: 13px;
+  padding: 6px 10px;
+}

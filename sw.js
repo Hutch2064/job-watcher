@@ -1,15 +1,15 @@
-const CACHE = "fieldnote-v14";
+const CACHE = "fieldnote-v15";
 const ASSETS = [
   "./",
   "index.html",
   "browse.html",
   "market.html",
   "methods.html",
-  "style.css?v=14",
-  "common.js?v=14",
-  "today.js?v=14",
-  "browse.js?v=14",
-  "market.js?v=14",
+  "style.css?v=15",
+  "common.js?v=15",
+  "today.js?v=15",
+  "browse.js?v=15",
+  "market.js?v=15",
   "manifest.webmanifest",
   "icon.svg",
   "icon-192.png",

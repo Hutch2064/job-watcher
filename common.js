@@ -182,3 +182,18 @@ if (typeof document !== "undefined")
     if (card && !window.getSelection()?.toString())
       card.querySelector("h3 a")?.click();
   });
+
+if (typeof window !== "undefined")
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    const nav = document.querySelector("header nav");
+    if (!nav || document.getElementById("install-app")) return;
+    const button = document.createElement("button");
+    button.id = "install-app";
+    button.textContent = "Install app";
+    button.addEventListener("click", async () => {
+      await event.prompt();
+      button.remove();
+    });
+    nav.append(button);
+  });
