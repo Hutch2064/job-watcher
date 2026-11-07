@@ -644,3 +644,64 @@ td {
   border-bottom: 1px solid var(--line);
   padding: 8px;
 }
+.mobile-nav {
+  display: none;
+}
+@media (max-width: 600px) {
+  header nav a:not(.brand) {
+    display: none;
+  }
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    display: flex;
+    min-height: 60px;
+    padding: 4px 8px calc(4px + env(safe-area-inset-bottom));
+    background: var(--header);
+    border-top: 1px solid var(--line);
+  }
+  .mobile-nav a {
+    display: flex;
+    flex: 1;
+    min-height: 48px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+  }
+  .mobile-nav a[aria-current] {
+    color: var(--accent);
+  }
+  .mobile-nav svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+@media print {
+  .mobile-nav {
+    display: none !important;
+  }
+}
+@view-transition {
+  navigation: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+@media (max-width: 600px) {
+  .mobile-nav a:not(.brand) {
+    padding: 4px 0;
+    border: 0;
+  }
+}
+.removed-column {
+  background: var(--removed);
+}

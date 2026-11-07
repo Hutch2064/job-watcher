@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <link rel="stylesheet" href="style.css?v=10" />
+    <link rel="stylesheet" href="style.css?v=11" />
     <title>Market | Fieldnote Jobs</title>
   </head>
   <body>
@@ -25,6 +25,41 @@
         ><a href="market.html" aria-current="page">Market</a>
       </nav>
     </header>
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a href="index.html"
+        ><svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M3 11.5 12 4l9 7.5V21H3z" />
+          <path d="M9 21v-7h6v7" /></svg
+        ><span>Today</span></a
+      ><a href="browse.html"
+        ><svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m16.5 16.5 4 4" /></svg
+        ><span>Browse</span></a
+      ><a href="market.html" aria-current="page"
+        ><svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg
+        ><span>Market</span></a
+      >
+    </nav>
     <main id="content">
       <p id="offline" class="offline" hidden></p>
       <div class="page-head">
@@ -42,6 +77,6 @@
         <a href="data/feed.xml">RSS</a>
       </footer>
     </main>
-    <script type="module" src="market.js?v=10"></script>
+    <script type="module" src="market.js?v=11"></script>
   </body>
 </html>

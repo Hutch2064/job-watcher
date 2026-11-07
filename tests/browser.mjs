@@ -39,6 +39,14 @@ try {
   await page.locator(".chart-card").first().waitFor();
   await page.goto("http://127.0.0.1:8765/index.html");
   await page.getByText("Source health").waitFor();
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.locator(".mobile-nav").isVisible(), true);
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+    true,
+  );
   const firstVisitContext = await browser.newContext();
   const firstVisit = await firstVisitContext.newPage();
   await firstVisit.goto("http://127.0.0.1:8765/index.html");

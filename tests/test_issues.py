@@ -18,3 +18,20 @@ def test_report_lists_changes_without_pinging_users():
     assert "## New (1)" in body
     assert "Research &#64;person" in body
     assert "## Removed (0)" in body
+
+
+def test_health_alerts_exclude_inactive_and_flag_suspect_or_repeat():
+    from issues import health_alerts
+
+    status = {
+        "sources": [
+            {"name": "Inactive", "inactive": True, "consecutive_failures": 9},
+            {"name": "One failure", "consecutive_failures": 1},
+            {"name": "Repeated", "consecutive_failures": 2},
+            {"name": "Sudden drop", "suspect": True, "consecutive_failures": 1},
+        ]
+    }
+    assert [item["name"] for item in health_alerts(status)] == [
+        "Repeated",
+        "Sudden drop",
+    ]

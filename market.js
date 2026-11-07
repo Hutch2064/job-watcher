@@ -8,7 +8,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=10";
+} from "./common.js?v=11";
 try {
   const { status, rows: allRows } = await load();
   function render(roleOnly) {
@@ -64,6 +64,14 @@ try {
           `<div class="day-column" title="${e(date)}: ${number(value)} new, ${number(roles[date] || 0)} matching roles"><div class="column-group"><div class="column" style="height:${(value / max) * 100}%"></div><div class="column role-column" style="height:${((roles[date] || 0) / roleMax) * 100}%"></div></div><span>${e(new Date(date + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" }))}</span></div>`,
       )
       .join("");
+    const removedDays = dateCounts(removed, "removed_date");
+    const removedMax = Math.max(1, ...removedDays.map((day) => day[1]));
+    const removedColumns = removedDays
+      .map(
+        ([date, value]) =>
+          `<div class="day-column" title="${e(date)}: ${number(value)} removals"><div class="column-group"><div class="column removed-column" style="height:${(value / removedMax) * 100}%"></div></div><span>${e(new Date(date + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" }))}</span></div>`,
+      )
+      .join("");
     const employers = counts(open, (row) => row.employer).map(
       ([name, value]) => [
         sources[name] && !sources[name].ok ? `${name} · stale` : name,
@@ -102,8 +110,8 @@ try {
       card(
         `${number(removed.length)} postings currently removed`,
         "Uses the most recent removal date; reopened postings are excluded.",
-        bars(dateCounts(removed, "removed_date"), "removed-bar"),
-        dateCounts(removed, "removed_date"),
+        `<div class="daily-chart">${removedColumns}</div>`,
+        removedDays,
       ) +
       card(
         `${number(open.length)} open postings`,
