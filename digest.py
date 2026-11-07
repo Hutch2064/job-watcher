@@ -131,15 +131,19 @@ def rank_job(row, day):
     ):
         return None
     reason = row.get("experience_reason", "")
+    minimum_match = re.search(r"\b(0|zero|1|one|2|two)\b", reason, re.I)
     if INTERNSHIP.search(title):
         experience_points = 35
         experience_label = "Internship"
-    elif re.search(r"\b(?:0|zero|1|one)\b", reason, re.I):
-        experience_points = 35
-        experience_label = "0–1 years minimum mentioned"
-    elif re.search(r"\b(?:2|two)\b", reason, re.I):
-        experience_points = 29
-        experience_label = "2 years minimum mentioned"
+    elif minimum_match:
+        token = minimum_match.group(1).lower()
+        minimum = (
+            int(token) if token.isdigit() else {"zero": 0, "one": 1, "two": 2}[token]
+        )
+        experience_points = 35 if minimum <= 1 else 29
+        experience_label = (
+            f"Minimum mentioned: {minimum} {'year' if minimum == 1 else 'years'}"
+        )
     else:
         experience_points = 30
         experience_label = "Early-career title signal"
