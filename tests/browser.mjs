@@ -60,6 +60,18 @@ try {
   await firstVisit.getByText(/Offline or unavailable/).waitFor();
   await firstVisit.getByText("Source health").waitFor();
   await firstVisitContext.close();
+  await page.setViewportSize({ width: 760, height: 1100 });
+  await page.goto("http://127.0.0.1:8765/email-preview.html");
+  await page.getByRole("heading", { level: 1 }).waitFor();
+  assert.ok((await page.getByRole("heading", { level: 2 }).count()) <= 2);
+  await page.screenshot({ path: "digest-preview.png", fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+    true,
+  );
   assert.deepEqual(errors, []);
 } finally {
   await browser.close();

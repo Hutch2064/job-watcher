@@ -17,6 +17,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Browser smoke and offline test
         run: |
+          python tests/render_digest.py
           python -m http.server 8765 > /tmp/job-watcher-server.log 2>&1 &
           node tests/browser.mjs
 
@@ -24,4 +25,6 @@ jobs:
         if: success()
         with:
           name: site-preview
-          path: fieldnote-preview.png
+          path: |
+            fieldnote-preview.png
+            digest-preview.png

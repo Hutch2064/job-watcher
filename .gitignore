@@ -2,3 +2,9 @@ __pycache__/
 .pytest_cache/
 .venv/
 .DS_Store
+
+# Private email recipient, MIME previews and delivery receipts
+.digest-local/
+email-preview.html
+fieldnote-preview.png
+digest-preview.png

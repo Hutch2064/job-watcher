@@ -143,3 +143,7 @@ A source that falls below half its previous good count is marked suspect, preser
 Shortlist entries, application statuses, and notes stay in the current browser’s local storage. They are not synchronized between devices; export the shortlist to CSV for a portable copy. Workday multi-location detail lookups are best effort and may remain incomplete when an employer restricts them.
 
 Vise’s Ashby feed begins a new source baseline. Its retired Greenhouse postings remain last-known records and may overlap the new board; they are not counted as removals without a successful check.
+
+## Personal email digest
+
+The optional [daily shortlist](DIGEST.md) ranks up to two current early-career investment roles after a successful daily update. It uses a private recipient configuration and connected Gmail delivery through a scheduled task; no address or send receipt is published on the site.
