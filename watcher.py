@@ -321,16 +321,41 @@ def experience_level(title, description=""):
     return ("unknown", "Experience not determined")
 
 
-_northern_lock = threading.Lock()
-_northern_last = 0.0
+_workday_lock = threading.Lock()
+_workday_next_request = 0.0
+
+
+def retry_after_seconds(error, fallback=20):
+    value = error.headers.get("Retry-After") if error.headers else None
+    if not value:
+        return fallback
+    try:
+        return max(0, int(value))
+    except ValueError:
+        try:
+            return max(
+                0,
+                (
+                    parsedate_to_datetime(value) - datetime.now(timezone.utc)
+                ).total_seconds(),
+            )
+        except (ValueError, TypeError):
+            return fallback
 
 
 def request(url, payload=None):
-    global _northern_last
-    if "ntrs.wd1.myworkdayjobs.com" in url.lower():
-        with _northern_lock:
-            time.sleep(max(0, 0.5 - (time.monotonic() - _northern_last)))
-            _northern_last = time.monotonic()
+    global _workday_next_request
+    is_workday = ".myworkdayjobs.com/" in url.lower()
+    if is_workday:
+        with _workday_lock:
+            wait = max(0, _workday_next_request - time.monotonic())
+            if wait > 120:
+                raise RuntimeError(
+                    "Workday requested a retry delay longer than this run permits"
+                )
+            time.sleep(wait)
+            interval = 0.6 if "ntrs.wd1.myworkdayjobs.com" in url.lower() else 0.35
+            _workday_next_request = time.monotonic() + interval
     data = json.dumps(payload).encode() if payload is not None else None
     req = urllib.request.Request(
         url,
@@ -341,8 +366,16 @@ def request(url, payload=None):
             "Content-Type": "application/json",
         },
     )
-    with urllib.request.urlopen(req, timeout=35) as response:
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(req, timeout=35) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        if is_workday and error.code == 429:
+            with _workday_lock:
+                _workday_next_request = max(
+                    _workday_next_request, time.monotonic() + retry_after_seconds(error)
+                )
+        raise
 
 
 def fetch(source):
