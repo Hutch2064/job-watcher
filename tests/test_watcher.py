@@ -753,3 +753,36 @@ def test_retry_after_header_is_respected():
     headers["Retry-After"] = "45"
     error = urllib.error.HTTPError("https://example.com", 429, "limited", headers, None)
     assert watcher.retry_after_seconds(error) == 45
+
+
+def test_workday_rate_limited_details_do_not_fail_complete_board(monkeypatch):
+    import urllib.error
+    from email.message import Message
+
+    source = {
+        "id": "example",
+        "name": "Example",
+        "type": "workday",
+        "host": "example.wd1",
+        "board": "jobs",
+    }
+    listing = {
+        "total": 1,
+        "jobPostings": [
+            {
+                "title": "Investment Analyst",
+                "externalPath": "/job/Analyst_1",
+                "locationsText": "Boston",
+            }
+        ],
+    }
+
+    def request(url, payload=None):
+        if payload is not None:
+            return listing
+        raise urllib.error.HTTPError(url, 429, "limited", Message(), None)
+
+    monkeypatch.setattr(watcher, "request", request)
+    data = watcher.fetch(source)
+    assert data["detail_rate_limited"] is True
+    assert len(watcher.normalize(source, data)) == 1
