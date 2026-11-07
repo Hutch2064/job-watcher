@@ -133,9 +133,9 @@ def test_same_day_rerun_failure_removes_only_that_sources_raw(tmp_path, monkeypa
     failures.add('a')
     watcher.collect()
     status=json.loads((tmp_path/'data/status.json').read_text())
-    assert not (folder/'a.json.gz').exists() and (folder/'b.json.gz').exists()
+    assert (folder/'a.json.gz').exists() and (folder/'b.json.gz').exists()
     assert status['days_with_success']==1 and status['successful_dates']==['2026-02-03']
-    assert status['open']==1 and status['sources'][0]['ok'] is False
+    assert status['open']==2 and status['sources'][0]['ok'] is False
 
 def test_ashby_normalization_and_duties():
     source = {'id':'globalx','name':'Global X','type':'ashby','board':'global-x-etfs'}
@@ -220,3 +220,21 @@ def test_ukg_fetches_all_pages_and_rejects_incomplete(monkeypatch):
     monkeypatch.setattr(watcher,'request',lambda url,payload=None:{'opportunities':[], 'totalCount':1})
     with pytest.raises(ValueError,match='Incomplete'):
         watcher.fetch(source)
+
+
+def test_suspect_drop_guard():
+    assert watcher.suspect_count(0, 100)
+    assert watcher.suspect_count(49, 100)
+    assert not watcher.suspect_count(50, 100)
+    assert not watcher.suspect_count(0, None)
+
+def test_unknown_raw_source_is_skipped(tmp_path, monkeypatch):
+    import gzip
+    monkeypatch.setattr(watcher, 'ROOT', tmp_path)
+    monkeypatch.setattr(watcher, 'SOURCES', [])
+    folder = tmp_path / 'data/raw/2026-01-01'
+    folder.mkdir(parents=True)
+    with gzip.open(folder / 'retired.json.gz', 'wt') as f:
+        f.write('{}')
+    history, dates = watcher.build()
+    assert history == {} and dates == set()

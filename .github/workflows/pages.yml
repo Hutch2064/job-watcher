@@ -19,8 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Prepare public site
+        run: |
+          mkdir -p _site/data
+          cp *.html *.js *.css *.png *.svg manifest.webmanifest _site/
+          cp data/status.json data/history.csv _site/data/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       - id: deployment
         uses: actions/deploy-pages@v4

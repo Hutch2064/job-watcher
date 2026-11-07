@@ -17,319 +17,447 @@
     {
       "name": "BlackRock",
       "ok": true,
-      "count": 275
+      "count": 275,
+      "id": "blackrock",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Invesco",
       "ok": true,
-      "count": 215
+      "count": 215,
+      "id": "invesco",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Fidelity",
       "ok": true,
-      "count": 855
+      "count": 855,
+      "id": "fidelity",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Dimensional",
       "ok": true,
-      "count": 72
+      "count": 72,
+      "id": "dimensional",
+      "last_success": "2026-11-07"
     },
     {
       "name": "T. Rowe Price",
       "ok": true,
-      "count": 135
+      "count": 135,
+      "id": "troweprice",
+      "last_success": "2026-11-07"
     },
     {
       "name": "State Street",
       "ok": true,
-      "count": 1185
+      "count": 1185,
+      "id": "statestreet",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Vanguard",
       "ok": true,
-      "count": 341
+      "count": 341,
+      "id": "vanguard",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Apollo",
       "ok": true,
-      "count": 56
+      "count": 56,
+      "id": "apollo",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Millennium",
-      "ok": true,
-      "count": 0
+      "ok": false,
+      "count": 0,
+      "id": "millennium",
+      "last_success": "2026-11-07",
+      "inactive": true,
+      "error": "Inactive: current public feed has not been verified"
     },
     {
       "name": "Point72",
       "ok": true,
-      "count": 201
+      "count": 201,
+      "id": "point72",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Bridgewater Associates",
       "ok": true,
-      "count": 21
+      "count": 21,
+      "id": "bridgewater",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Connor, Clark & Lunn",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "cclim",
+      "last_success": "2026-11-07"
     },
     {
       "name": "TPG",
       "ok": true,
-      "count": 19
+      "count": 19,
+      "id": "tpg",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Jane Street",
       "ok": true,
-      "count": 219
+      "count": 219,
+      "id": "janestreet",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Betterment",
       "ok": true,
-      "count": 26
+      "count": 26,
+      "id": "betterment",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Man Group",
       "ok": true,
-      "count": 72
+      "count": 72,
+      "id": "mangroup",
+      "last_success": "2026-11-07"
     },
     {
       "name": "AQR",
       "ok": true,
-      "count": 53
+      "count": 53,
+      "id": "aqr",
+      "last_success": "2026-11-07"
     },
     {
       "name": "WisdomTree UK",
       "ok": true,
-      "count": 4
+      "count": 4,
+      "id": "wisdomtreeuk",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Thrivent",
       "ok": true,
-      "count": 316
+      "count": 316,
+      "id": "thrivent",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Neuberger Berman",
       "ok": true,
-      "count": 92
+      "count": 92,
+      "id": "neuberger",
+      "last_success": "2026-11-07"
     },
     {
       "name": "AllianceBernstein",
       "ok": true,
-      "count": 86
+      "count": 86,
+      "id": "alliancebernstein",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Hartford",
       "ok": true,
-      "count": 230
+      "count": 230,
+      "id": "hartford",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Northern Trust",
       "ok": true,
-      "count": 642
+      "count": 642,
+      "id": "northerntrust",
+      "last_success": "2026-11-07"
     },
     {
       "name": "TIAA / Nuveen",
       "ok": true,
-      "count": 165
+      "count": 165,
+      "id": "tiaa",
+      "last_success": "2026-11-07"
     },
     {
       "name": "GMO",
       "ok": true,
-      "count": 9
+      "count": 9,
+      "id": "gmo",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Harris | Oakmark",
       "ok": true,
-      "count": 2
+      "count": 2,
+      "id": "oakmark",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Avantis Investors",
       "ok": true,
-      "count": 1
+      "count": 1,
+      "id": "avantis",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Capital Group",
       "ok": true,
-      "count": 176
+      "count": 176,
+      "id": "capitalgroup",
+      "last_success": "2026-11-07"
     },
     {
       "name": "PIMCO",
       "ok": false,
       "count": 0,
-      "error": "HTTP Error 429: Too Many Requests"
+      "error": "HTTP Error 429: Too Many Requests",
+      "id": "pimco",
+      "last_success": "2026-11-06"
     },
     {
       "name": "Wellington Management",
       "ok": true,
-      "count": 117
+      "count": 117,
+      "id": "wellington",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Russell Investments",
       "ok": true,
-      "count": 47
+      "count": 47,
+      "id": "russell",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Fiera Capital",
       "ok": true,
-      "count": 10
+      "count": 10,
+      "id": "fiera",
+      "last_success": "2026-11-07"
     },
     {
       "name": "PGIM / Prudential",
       "ok": true,
-      "count": 188
+      "count": 188,
+      "id": "pgim",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Texas Permanent School Fund",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "texaspsf",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Ontario Teachers Pension Plan",
       "ok": true,
-      "count": 34
+      "count": 34,
+      "id": "ontarioteachers",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Ares Management",
       "ok": true,
-      "count": 233
+      "count": 233,
+      "id": "ares",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Manulife",
       "ok": true,
-      "count": 618
+      "count": 618,
+      "id": "manulife",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Cambridge Associates",
       "ok": true,
-      "count": 45
+      "count": 45,
+      "id": "cambridgeassociates",
+      "last_success": "2026-11-07"
     },
     {
       "name": "BMO",
       "ok": true,
-      "count": 1034
+      "count": 1034,
+      "id": "bmo",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Athora",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "athora",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Jupiter Asset Management",
       "ok": true,
-      "count": 14
+      "count": 14,
+      "id": "jupiteram",
+      "last_success": "2026-11-07"
     },
     {
       "name": "New York State Teachers Retirement System",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "nystrs",
+      "last_success": "2026-11-07"
     },
     {
       "name": "CAAT Pension Plan",
       "ok": true,
-      "count": 16
+      "count": 16,
+      "id": "caat",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Brookfield",
       "ok": true,
-      "count": 142
+      "count": 142,
+      "id": "brookfield",
+      "last_success": "2026-11-07"
     },
     {
       "name": "ICONIQ",
       "ok": true,
-      "count": 15
+      "count": 15,
+      "id": "iconiq",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Vise",
       "ok": false,
       "count": 0,
-      "error": "HTTP Error 404: Not Found"
+      "error": "HTTP Error 404: Not Found",
+      "id": "vise",
+      "last_success": "2026-11-06"
     },
     {
       "name": "Forteus / Numeus",
       "ok": true,
-      "count": 1
+      "count": 1,
+      "id": "forteus",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Choreo",
       "ok": true,
-      "count": 7
+      "count": 7,
+      "id": "choreo",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Star Mountain Capital",
       "ok": true,
-      "count": 9
+      "count": 9,
+      "id": "starmountain",
+      "last_success": "2026-11-07"
     },
     {
       "name": "CAIS",
       "ok": true,
-      "count": 14
+      "count": 14,
+      "id": "cais",
+      "last_success": "2026-11-07"
     },
     {
       "name": "CC&L Quantitative",
       "ok": true,
-      "count": 8
+      "count": 8,
+      "id": "cclquant",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Galvanize",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "galvanize",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Mercer Advisors",
       "ok": true,
-      "count": 96
+      "count": 96,
+      "id": "merceradvisors",
+      "last_success": "2026-11-07"
     },
     {
       "name": "iCapital",
       "ok": true,
-      "count": 219
+      "count": 219,
+      "id": "icapital",
+      "last_success": "2026-11-07"
     },
     {
       "name": "WisdomTree US",
       "ok": true,
-      "count": 0
+      "count": 0,
+      "id": "wisdomtreeus",
+      "last_success": "2026-11-07"
     },
     {
       "name": "EP Wealth Advisors",
       "ok": true,
-      "count": 37
+      "count": 37,
+      "id": "epwealth",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Wealthfront",
       "ok": true,
-      "count": 23
+      "count": 23,
+      "id": "wealthfront",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Global X ETFs",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "globalx",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Range",
       "ok": true,
-      "count": 66
+      "count": 66,
+      "id": "range",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Compound Planning",
       "ok": true,
-      "count": 5
+      "count": 5,
+      "id": "compound",
+      "last_success": "2026-11-07"
     },
     {
       "name": "Calamos Investments",
       "ok": true,
-      "count": 13
+      "count": 13,
+      "id": "calamos",
+      "last_success": "2026-11-07"
     },
     {
       "name": "VanEck",
       "ok": true,
-      "count": 40
+      "count": 40,
+      "id": "vaneck",
+      "last_success": "2026-11-07"
     },
     {
       "name": "American Century Investments",
       "ok": true,
-      "count": 19
+      "count": 19,
+      "id": "americancentury",
+      "last_success": "2026-11-07"
     }
   ]
 }

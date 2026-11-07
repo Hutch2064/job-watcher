@@ -9,14 +9,17 @@ import json
 import re
 import sys
 import time
+import threading
 import urllib.request
+import urllib.error
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlencode
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = json.loads((ROOT / 'sources.json').read_text())
-FIELDS = 'posting_id source source_id employer title location department posted_date url in_role first_run first_seen last_seen status removed_date experience experience_reason duty_excerpt cover_letter cover_letter_reason'.split()
+FIELDS = 'posting_id source source_id employer title location remote department posted_date url in_role first_run first_seen last_seen status removed_date experience experience_reason duty_excerpt cover_letter cover_letter_reason'.split()
 ROLE = re.compile(r'\b(portfolio|asset allocation|investment|investing|equity research|fixed.income|credit research|credit analyst|equity analyst|quantitative research|quantitative analyst|fund research|manager research|etf|wealth (?:management|advisor)|financial planning|investment consulting|ocio|multi.asset|systematic|risk analytics|risk analyst|risk analysis|risk reporting|performance analyst|performance analysis|performance attribution|performance reporting|due diligence|investment operations|trade operations|trading operations|operations analyst|operations associate|operations specialist|trade support|corporate actions|fund accounting|fund administration|asset management|research analyst|research associate)\b', re.I)
 EXCLUDE = re.compile(r'\b(sales|marketing|administrative assistant|recruiter|tax|auditor|software engineer|cybersecurity|legal counsel)\b', re.I)
 
@@ -140,7 +143,15 @@ def experience_level(title, description=''):
     if PROGRAM.search(title): return ('early', 'Program in title')
     return ('unknown', 'Experience not determined')
 
+_northern_lock = threading.Lock()
+_northern_last = 0.0
+
 def request(url, payload=None):
+    global _northern_last
+    if 'ntrs.wd1.myworkdayjobs.com' in url.lower():
+        with _northern_lock:
+            time.sleep(max(0, 0.5 - (time.monotonic() - _northern_last)))
+            _northern_last = time.monotonic()
     data = json.dumps(payload).encode() if payload is not None else None
     req = urllib.request.Request(url, data=data, headers={'User-Agent':'JobWatcher academic project/1.0', 'Accept':'application/json', 'Content-Type':'application/json'})
     with urllib.request.urlopen(req, timeout=35) as response:
@@ -206,7 +217,8 @@ def fetch(source):
     for page in pages:
         for job in page['jobPostings']:
             if not job.get('externalPath'):
-                raise ValueError('Workday posting has no external path')
+                print(f"{source['name']}: skipping posting with no external path", file=sys.stderr)
+                continue
             if not job.get('title'):
                 path = job['externalPath']
                 detail_url = f"https://{source['host']}.myworkdayjobs.com/wday/cxs/{source['host'].split('.')[0]}/{board}{path}"
@@ -215,15 +227,15 @@ def fetch(source):
                 if not title: raise ValueError(f'Workday posting has no recoverable title: {path}')
                 recovered_titles[path] = title
     # Detail lookups enrich relevant roles without jeopardizing the complete board snapshot.
-    postings = [j for page in pages for j in page['jobPostings'] if in_role(j.get('title') or recovered_titles[j['externalPath']]) and not SENIOR.search(j.get('title') or recovered_titles[j['externalPath']])]
+    postings = [j for page in pages for j in page['jobPostings'] if j.get('externalPath') and in_role(j.get('title') or recovered_titles.get(j['externalPath'], '')) and not SENIOR.search(j.get('title') or recovered_titles.get(j['externalPath'], ''))]
     def detail(job):
         try:
             url = f"https://{source['host']}.myworkdayjobs.com/wday/cxs/{source['host'].split('.')[0]}/{board}{job['externalPath']}"
             info = request(url).get('jobPostingInfo', {})
-            return job['externalPath'], info.get('jobDescription', '')
+            return job['externalPath'], info
         except Exception:
             return job['externalPath'], ''
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=1 if source['id'] == 'northerntrust' else 4) as pool:
         details = dict(pool.map(detail, postings))
     return {'pages':pages, 'details':details, 'recovered_titles':recovered_titles}
 
@@ -236,6 +248,14 @@ def utc_date(value):
     except (AttributeError, TypeError, ValueError):
         return ''
 
+def normalize_location(value):
+    location = re.sub(r'\s+', ' ', str(value or '')).strip()
+    location = re.sub(r',\s*(?:United States of America|United States|USA)$', '', location, flags=re.I)
+    states = {'New York':'NY', 'Massachusetts':'MA', 'California':'CA', 'Illinois':'IL', 'Texas':'TX', 'New Jersey':'NJ', 'Connecticut':'CT', 'Pennsylvania':'PA', 'Florida':'FL', 'Colorado':'CO', 'Washington':'WA'}
+    for state, abbreviation in states.items():
+        location = re.sub(r',\s*' + state + '$', ', ' + abbreviation, location, flags=re.I)
+    return location
+
 def normalize(source, data):
     kind = source['type']; rows = []
     if kind in ('greenhouse', 'ashby'): items = data['jobs']
@@ -243,8 +263,10 @@ def normalize(source, data):
     elif kind == 'ukg': items = [j for page in data['pages'] for j in page['opportunities']]
     else: items = [j for page in data['pages'] for j in page['jobPostings']]
     for j in items:
+        if kind == 'workday' and not j.get('externalPath'):
+            continue
         if kind == 'greenhouse':
-            sid = str(j['id']); loc = (j.get('location') or {}).get('name',''); dep = ', '.join(d.get('name','') for d in j.get('departments',[])); url = j['absolute_url']; posted = (j.get('first_published') or '')[:10]
+            sid = str(j['id']); loc = (j.get('location') or {}).get('name',''); dep = ', '.join(d.get('name','') for d in j.get('departments',[])); url = j['absolute_url']; posted = utc_date(j.get('first_published'))
         elif kind == 'ukg':
             if not j.get('Id'): raise ValueError('UKG posting has no ID')
             sid = str(j['Id']); locations = []
@@ -262,7 +284,7 @@ def normalize(source, data):
         elif kind == 'lever':
             sid = str(j['id']); cat = j.get('categories') or {}; loc = cat.get('location',''); dep = cat.get('department') or cat.get('team') or ''; url = j['hostedUrl']; posted = datetime.fromtimestamp(j['createdAt']/1000, timezone.utc).date().isoformat() if j.get('createdAt') else ''
         else:
-            path = j['externalPath']; sid = path.rsplit('_',1)[-1]; loc = j.get('locationsText',''); dep = ''; posted = ''; url = f"https://{source['host']}.myworkdayjobs.com/en-US/{source['board']}{path}"
+            path = j['externalPath']; sid = path.rsplit('_',1)[-1]; loc = j.get('locationsText',''); dep = ''; info = data.get('details', {}).get(path, {}); info = info if isinstance(info, dict) else {}; posted = utc_date(info.get('startDate') or info.get('postedOn')); loc = info.get('location') or loc; extra = info.get('additionalLocations') or []; loc = ' / '.join(dict.fromkeys([loc] + [x for x in extra if isinstance(x, str)])); url = f"https://{source['host']}.myworkdayjobs.com/en-US/{source['board']}{path}"
         title = j['text'] if kind == 'lever' else (j['Title'] if kind == 'ukg' else (j.get('title') or data.get('recovered_titles', {}).get(j.get('externalPath', '')) if kind == 'workday' else j['title']))
         if not title: raise ValueError('Posting title unavailable')
         if kind == 'greenhouse': description = j.get('content', '')
@@ -270,11 +292,15 @@ def normalize(source, data):
         elif kind == 'ashby': description = j.get('descriptionPlain') or j.get('descriptionHtml') or ''
         elif kind == 'lever':
             description = ' '.join([j.get('descriptionPlain') or j.get('description') or '', j.get('additionalPlain') or j.get('additional') or ''] + [x.get('text', '') + ' ' + (x.get('content') or '') for x in j.get('lists', [])])
-        else: description = data.get('details', {}).get(j['externalPath'], '')
+        else:
+            detail = data.get('details', {}).get(j['externalPath'], '')
+            description = detail.get('jobDescription', '') if isinstance(detail, dict) else detail
+        loc = normalize_location(loc)
+        remote = bool(re.search(r'\bremote\b', ' '.join([loc, title]), re.I))
         level, reason = experience_level(title, description)
         form = data.get('form_details', {}).get(sid) if kind == 'greenhouse' else None
         cover, cover_reason = cover_letter_assessment(description, form)
-        rows.append(dict(experience=level, experience_reason=reason, duty_excerpt=duty_excerpt(description) if in_role(title) else '', cover_letter=cover, cover_letter_reason=cover_reason, posting_id=source['id']+':'+sid, source=source['id'], source_id=sid, employer=source['name'], title=title, location=loc or '', department=dep or '', posted_date=posted, url=url, in_role=str(in_role(title)).lower()))
+        rows.append(dict(experience=level, experience_reason=reason, duty_excerpt=duty_excerpt(description) if in_role(title) else '', cover_letter=cover, cover_letter_reason=cover_reason, posting_id=source['id']+':'+sid, source=source['id'], source_id=sid, employer=source['name'], title=title, location=loc or '', remote=str(remote).lower(), department=dep or '', posted_date=posted, url=url, in_role=str(in_role(title)).lower()))
     if len({r['posting_id'] for r in rows}) != len(rows): raise ValueError('Duplicate source IDs')
     return rows
 
@@ -283,7 +309,9 @@ def build():
     for folder in sorted((ROOT/'data/raw').glob('????-??-??')):
         for path in sorted(folder.glob('*.json.gz')):
             source = by_id.get(path.name[:-8])
-            if not source: raise ValueError(f'Unknown source: {path}')
+            if not source:
+                print(f'Skipping unknown source: {path}', file=sys.stderr)
+                continue
             with gzip.open(path, 'rt', encoding='utf-8') as f: rows = normalize(source, json.load(f))
             date = folder.name; dates.add(date); first = source['id'] not in seen_sources; seen_sources.add(source['id']); ids = set()
             for row in rows:
@@ -299,30 +327,59 @@ def build():
         writer = csv.DictWriter(f, fieldnames=FIELDS, lineterminator='\n'); writer.writeheader(); writer.writerows(history[k] for k in sorted(history))
     return history, dates
 
+def suspect_count(current, previous):
+    return previous is not None and previous > 0 and current < previous / 2
+
+def last_good(source_id, before_date):
+    for path in sorted((ROOT / 'data/raw').glob('????-??-??/' + source_id + '.json.gz'), reverse=True):
+        if path.parent.name >= before_date:
+            continue
+        source = next((item for item in SOURCES if item['id'] == source_id), None)
+        if source:
+            try:
+                with gzip.open(path, 'rt', encoding='utf-8') as stream:
+                    return path.parent.name, len(normalize(source, json.load(stream)))
+            except Exception as exc:
+                print(f'Unable to read prior source {path}: {exc}', file=sys.stderr)
+    return None, None
+
 def fetch_validated(source, attempts=3):
     for attempt in range(attempts):
         try:
             data = fetch(source)
             return data, normalize(source, data)
-        except Exception:
+        except Exception as exc:
             if attempt == attempts - 1: raise
-            time.sleep(attempt + 1)
+            delay = attempt + 1
+            if isinstance(exc, urllib.error.HTTPError) and exc.headers.get('Retry-After'):
+                value = exc.headers['Retry-After']
+                try: delay = max(delay, int(value))
+                except ValueError:
+                    try: delay = max(delay, (parsedate_to_datetime(value) - datetime.now(timezone.utc)).total_seconds())
+                    except (ValueError, TypeError): pass
+            if delay > 120:
+                raise  # Do not retry earlier than the server requested.
+            time.sleep(delay)
 
 def collect():
     now = datetime.now(timezone.utc); date = now.date().isoformat(); folder = ROOT/'data/raw'/date; folder.mkdir(parents=True, exist_ok=True); results=[]
     def collect_one(s):
         path = folder/(s['id']+'.json.gz')
+        last_date, last_count = last_good(s['id'], date)
         try:
             data, rows = fetch_validated(s)
+            if suspect_count(len(rows), last_count):
+                raise ValueError(f'Suspect count: {len(rows)} versus {last_count} on {last_date}')
             # Write a complete file atomically; a failed rerun cannot masquerade as today's successful source.
             temp = path.with_suffix('.tmp')
             with temp.open('wb') as raw:
                 with gzip.GzipFile(fileobj=raw, mode='wb', mtime=0) as out: out.write(json.dumps(data, ensure_ascii=False, separators=(',',':')).encode())
-            temp.replace(path); print(s['name'],len(rows), flush=True); return {'name':s['name'], 'ok':True, 'count':len(rows)}
+            temp.replace(path); print(s['name'],len(rows), flush=True); return {'id':s['id'], 'name':s['name'], 'ok':True, 'count':len(rows), 'last_success':date}
         except Exception as exc:
-            path.unlink(missing_ok=True); print(s['name'], 'FAILED', exc, file=sys.stderr, flush=True); return {'name':s['name'], 'ok':False, 'count':0, 'error':str(exc)}
+            print(s['name'], 'FAILED', exc, file=sys.stderr, flush=True); return {'id':s['id'], 'name':s['name'], 'ok':False, 'count':0, 'error':str(exc), 'suspect':str(exc).startswith('Suspect count:'), 'last_success':date if path.exists() else last_date}
     with ThreadPoolExecutor(max_workers=5) as pool:
-        results = list(pool.map(collect_one, SOURCES))
+        results = list(pool.map(collect_one, [s for s in SOURCES if s.get('active', True) and s['id'] != 'northerntrust']))
+    results.extend(collect_one(s) for s in SOURCES if s['id'] == 'northerntrust')
     history, dates = build(); rows = list(history.values())
     status = {'run_time':now.isoformat().replace('+00:00','Z'), 'first_run_date':min(dates) if dates else '', 'days_with_success':len(dates), 'successful_dates':sorted(dates), 'open':sum(r['status']=='open' for r in rows), 'new_today':sum(r['first_seen']==date and r['first_run']=='false' for r in rows), 'removed_today':sum(r['removed_date']==date for r in rows), 'sources':results}
     (ROOT/'data/status.json').write_text(json.dumps(status, indent=2)+'\n')

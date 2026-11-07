@@ -4,6 +4,12 @@
 
 A daily job watcher for investment research, portfolio construction, allocation, analytics and investment-facing portfolio solutions. [Open the site](https://hutch2064.github.io/job-watcher/). It watches full public employer ATS boards, not job-board HTML or a third-party aggregator. Roles are global; a title match is a discovery aid, not an assessment of eligibility or job duties.
 
+
+```text
+Public ATS JSON → daily raw snapshots → deterministic history and status
+                                      ↘ GitHub issue and Pages site
+```
+
 ## Sources
 
 `sources.json` is the authoritative configuration. The watchlist has the following public JSON boards; the status on Today shows the result of the latest check. BlackRock includes iShares; Dimensional includes DFA. WisdomTree UK is its UK Lever board, not a claim to cover every WisdomTree location. State Street's board includes the wider company alongside its investment business. The same applies to other diversified firms. An employer can legitimately have zero openings. No configured board is filtered by a search term. A board exceeding 5,000 postings fails validation rather than being truncated. Workday responses reporting exactly 2,000 are also rejected because that can be a capped result.
@@ -18,7 +24,7 @@ A daily job watcher for investment research, portfolio construction, allocation,
 | State Street | Workday |
 | Vanguard | Workday |
 | Apollo | Workday |
-| Millennium | Workday |
+| Millennium | Workday (inactive; see source review) |
 | Point72 | Greenhouse |
 | Bridgewater Associates | Greenhouse |
 | Connor, Clark & Lunn | Greenhouse |
@@ -35,7 +41,7 @@ A daily job watcher for investment research, portfolio construction, allocation,
 | Northern Trust | Workday |
 | TIAA / Nuveen | Workday |
 | GMO | Lever |
-| Harris /  Oakmark | Greenhouse |
+| Harris / Oakmark | Greenhouse |
 | Avantis Investors | Workday |
 | Capital Group | Workday |
 | PIMCO | Workday |
@@ -78,7 +84,7 @@ See [SOURCE_REVIEW.md](SOURCE_REVIEW.md) for requested brands mapped to the watc
 
 ## How the pipeline works
 
-At 12:23 UTC daily, GitHub Actions requests every board independently, paginating Workday and UKG, validates completeness and unique IDs, retries failed or changing boards up to three times, writes each successful full JSON response to `data/raw/YYYY-MM-DD/<source>.json.gz`, and records each result. An incomplete, blocked or failed board gets no raw file on that date. On a same-day rerun its previous raw file is replaced or removed; a failed check cannot imply removals. The program rebuilds `data/history.csv` entirely from raw files, in date order, then creates `data/status.json`. It commits the data and opens or updates the dated issue and closes the preceding day's issue. The daily workflow explicitly dispatches the test workflow after its bot commit, because GitHub does not trigger push workflows for that commit. Initial observations per source are not counted as new. On successful later snapshots missing postings are marked removed; reappearing postings retain first seen and reopen. Each source's raw data is kept in the repository. Scheduled runs can be delayed by GitHub.
+At 12:23 and 20:23 UTC daily, GitHub Actions requests every board independently, paginating Workday and UKG, validates completeness and unique IDs, retries failed or changing boards up to three times, writes each successful full JSON response to `data/raw/YYYY-MM-DD/<source>.json.gz`, and records each result. An incomplete, blocked or failed board gets no raw file on that date. On a same-day rerun, a successful raw file is replaced, while a failed retry preserves the earlier successful snapshot and reports the latest error. The program rebuilds `data/history.csv` entirely from raw files, in date order, then creates `data/status.json`. It commits the data and opens or updates the dated issue and closes older dated Job Watcher issues. The daily workflow explicitly dispatches the test workflow after its bot commit, because GitHub does not trigger push workflows for that commit. Initial observations per source are not counted as new. On successful later snapshots missing postings are marked removed; reappearing postings retain first seen and reopen. Each source's raw data is kept in the repository. Scheduled runs can be delayed by GitHub.
 
 Run from the repository directory:
 
@@ -125,3 +131,5 @@ Lever's public postings API does not expose custom application questions; the pu
 | `.github/workflows/daily.yml` | Scheduled/manual collector, issue and data commit. |
 | `.github/workflows/pages.yml` | GitHub Pages deployment. |
 | `.gitignore`, `README.md`, `SOURCE_REVIEW.md`, `SUBMISSION.txt` | Local exclusions, documentation, source review and four-line submission. |
+
+Raw snapshots grow over time (approximately 3 MB per day in the initial week). For longer-term operation, older raw files could move to versioned release assets while retaining a reproducible archive. Millennium’s zero-result Workday feed is inactive pending validation of its current careers feed.
