@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-globalThis.navigator = {};
+if (!globalThis.navigator) Object.defineProperty(globalThis, 'navigator', {value:{}, configurable:true});
 const source = await readFile(new URL('../common.js', import.meta.url), 'utf8');
 const common = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 assert.deepEqual(common.parseCSV('title,location\n"Analyst, Portfolio","New York, NY"\n'), [{title:'Analyst, Portfolio',location:'New York, NY'}]);
