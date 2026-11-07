@@ -547,11 +547,19 @@ def fetch(source):
         )
     ]
 
+    detail_rate_limited = threading.Event()
+
     def detail(job):
+        if detail_rate_limited.is_set():
+            return job["externalPath"], ""
         try:
             url = f"https://{source['host']}.myworkdayjobs.com/wday/cxs/{source['host'].split('.')[0]}/{board}{job['externalPath']}"
             info = request(url).get("jobPostingInfo", {})
             return job["externalPath"], info
+        except urllib.error.HTTPError as error:
+            if error.code == 429:
+                detail_rate_limited.set()
+            return job["externalPath"], ""
         except Exception:
             return job["externalPath"], ""
 
@@ -559,7 +567,12 @@ def fetch(source):
         max_workers=1 if source["id"] == "northerntrust" else 4
     ) as pool:
         details = dict(pool.map(detail, postings))
-    return {"pages": pages, "details": details, "recovered_titles": recovered_titles}
+    return {
+        "pages": pages,
+        "details": details,
+        "recovered_titles": recovered_titles,
+        "detail_rate_limited": detail_rate_limited.is_set(),
+    }
 
 
 def utc_date(value):
@@ -931,6 +944,11 @@ def collect():
                 "ok": True,
                 "count": len(rows),
                 "last_success": date,
+                "warning": (
+                    "Some location and description details were rate-limited"
+                    if isinstance(data, dict) and data.get("detail_rate_limited")
+                    else ""
+                ),
             }
         except Exception as exc:
             print(s["name"], "FAILED", exc, file=sys.stderr, flush=True)

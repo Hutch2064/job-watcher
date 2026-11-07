@@ -6,7 +6,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=16";
+} from "./common.js?v=17";
 try {
   const { status, rows } = await load();
   const date = status.run_time.slice(0, 10);
@@ -67,7 +67,7 @@ try {
     .sort((a, b) => Number(a.ok) - Number(b.ok) || a.name.localeCompare(b.name))
     .map(
       (source) =>
-        `<div class="source"><strong>${e(source.name)}</strong><span class="${source.ok ? "healthy" : "error"}">${source.ok ? "Checked" : source.suspect ? "Suspect" : "Unavailable"}</span><span>Last successful check: ${e(source.last_success || (source.ok ? date : "Not available"))}</span>${source.error ? `<span>${e(source.error)}</span>` : ""}${
+        `<div class="source"><strong>${e(source.name)}</strong><span class="${source.ok ? "healthy" : "error"}">${source.ok ? "Checked" : source.suspect ? "Suspect" : "Unavailable"}</span><span>Last successful check: ${e(source.last_success || (source.ok ? date : "Not available"))}</span>${source.error ? `<span>${e(source.error)}</span>` : ""}${source.warning ? `<span>${e(source.warning)}</span>` : ""}${
           source.observed_dates
             ? `<span class="health-strip" aria-label="Saved observations over recent dates">${(
                 status.successful_dates || []
