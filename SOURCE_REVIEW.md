@@ -17,3 +17,5 @@ YieldMax, Tuttle Capital, Overlay Shares, X ETFs, Corgi, Tima, HCM, Schwab, Defi
 ## Retired feed
 
 Millennium's configured Workday board repeatedly returned zero while its [current careers site](https://career.mlp.com/careers) lists openings. The unverified board is inactive; its historic raw files remain available for reproducibility. A complete public JSON endpoint for the current careers site has not been validated.
+
+Vise moved to a public Ashby board. The previous Greenhouse feed returns 404 and is retained as an inactive historical source; the Ashby board is tracked separately to preserve source IDs and first-snapshot semantics. Older Vise openings remain last-known historical records, and may overlap the new feed.

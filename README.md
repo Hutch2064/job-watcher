@@ -65,7 +65,7 @@ See the [Methods page](https://hutch2064.github.io/job-watcher/methods.html) for
 | CAAT Pension Plan | Workday |
 | Brookfield | Workday |
 | ICONIQ | Greenhouse |
-| Vise | Greenhouse |
+| Vise | Ashby (former Greenhouse board retained as inactive history) |
 | Forteus / Numeus | Greenhouse |
 | Choreo | Greenhouse |
 | Star Mountain Capital | Greenhouse |
@@ -141,3 +141,5 @@ Raw snapshots grow over time (approximately 3 MB per day in the initial week). F
 A source that falls below half its previous good count is marked suspect, preserving the last snapshot. After confirming a genuine drop at the employer, set `accept_count_drop: true` on that source for one collection, then remove the override. The observed-date list in source health records saved snapshots; an absent date does not by itself prove an attempted check failed.
 
 Shortlist entries, application statuses, and notes stay in the current browser’s local storage. They are not synchronized between devices; export the shortlist to CSV for a portable copy. Workday multi-location detail lookups are best effort and may remain incomplete when an employer restricts them.
+
+Vise’s Ashby feed begins a new source baseline. Its retired Greenhouse postings remain last-known records and may overlap the new board; they are not counted as removals without a successful check.

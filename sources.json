@@ -305,9 +305,10 @@
   },
   {
     "id": "vise",
-    "name": "Vise",
+    "name": "Vise (retired Greenhouse board)",
     "type": "greenhouse",
-    "board": "viseai"
+    "board": "viseai",
+    "active": false
   },
   {
     "id": "forteus",
@@ -415,5 +416,11 @@
     "type": "workday",
     "host": "americancentury.wd5",
     "board": "AmericanCenturyInvestments"
+  },
+  {
+    "id": "viseashby",
+    "name": "Vise",
+    "type": "ashby",
+    "board": "vise"
   }
 ]
