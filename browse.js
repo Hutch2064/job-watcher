@@ -8,7 +8,7 @@ import {
   normalizeLocation,
   escapeHTML as e,
   showError,
-} from "./common.js?v=15";
+} from "./common.js?v=16";
 
 try {
   const { status, rows } = await load();
@@ -113,6 +113,8 @@ try {
     return (
       (!$("#employer").value || row.employer === $("#employer").value) &&
       (!$("#location").value ||
+        (row.remote === "true" &&
+          "remote".includes($("#location").value.toLowerCase())) ||
         normalizeLocation(row.location)
           .toLowerCase()
           .includes($("#location").value.toLowerCase())) &&

@@ -721,7 +721,13 @@ def normalize(source, data):
                 detail.get("jobDescription", "") if isinstance(detail, dict) else detail
             )
         loc = normalize_location(loc)
-        remote = bool(re.search(r"\bremote\b", " ".join([loc, title]), re.I))
+        remote = j.get("isRemote") is True or bool(
+            re.search(
+                r"\bremote\b",
+                " ".join([loc, title, str(j.get("workplaceType") or "")]),
+                re.I,
+            )
+        )
         level, reason = experience_level(title, description)
         form = data.get("form_details", {}).get(sid) if kind == "greenhouse" else None
         cover, cover_reason = cover_letter_assessment(description, form)

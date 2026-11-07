@@ -6,7 +6,7 @@ import {
   escapeHTML as e,
   number,
   showError,
-} from "./common.js?v=15";
+} from "./common.js?v=16";
 try {
   const { status, rows } = await load();
   const date = status.run_time.slice(0, 10);
