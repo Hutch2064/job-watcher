@@ -39,6 +39,7 @@ try {
   await page.locator(".chart-card").first().waitFor();
   await page.goto("http://127.0.0.1:8765/index.html");
   await page.getByText("Source health").waitFor();
+  await page.screenshot({ path: "fieldnote-preview.png", fullPage: false });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.locator(".mobile-nav").isVisible(), true);
   assert.equal(

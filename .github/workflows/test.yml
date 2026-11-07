@@ -19,3 +19,9 @@ jobs:
         run: |
           python -m http.server 8765 > /tmp/job-watcher-server.log 2>&1 &
           node tests/browser.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: site-preview
+          path: fieldnote-preview.png
