@@ -88,7 +88,7 @@ See [SOURCE_REVIEW.md](SOURCE_REVIEW.md) for requested brands mapped to the watc
 
 ## How the pipeline works
 
-At 12:23 and 20:23 UTC daily, GitHub Actions requests every board independently, paginating Workday and UKG, validates completeness and unique IDs, retries failed or changing boards up to three times, writes each successful full JSON response to `data/raw/YYYY-MM-DD/<source>.json.gz`, and records each result. An incomplete, blocked or failed board gets no raw file on that date. On a same-day rerun, a successful raw file is replaced, while a failed retry preserves the earlier successful snapshot and reports the latest error. The program rebuilds `data/history.csv` entirely from raw files, in date order, then creates `data/status.json`. It commits the data and opens or updates the dated issue and closes older dated Job Watcher issues. The daily workflow explicitly dispatches the test workflow after its bot commit, because GitHub does not trigger push workflows for that commit. Initial observations per source are not counted as new. On successful later snapshots missing postings are marked removed; reappearing postings retain first seen and reopen. Each source's raw data is kept in the repository. Scheduled runs can be delayed by GitHub.
+At 12:23 and 20:23 UTC daily, GitHub Actions requests every board independently, paginating Workday and UKG, validates completeness and unique IDs, retries failed or changing boards up to three times, writes each successful full JSON response to `data/raw/YYYY-MM-DD/<source>.json.gz`, and records each result. An incomplete, blocked or failed attempt writes no new raw file. On a same-day rerun, a successful raw file is replaced, while a failed retry preserves the earlier successful snapshot and reports the latest error. The program rebuilds `data/history.csv` entirely from raw files, in date order, then creates `data/status.json`. It commits the data and opens or updates the dated issue and closes older dated Job Watcher issues. The daily workflow explicitly dispatches the test workflow after its bot commit, because GitHub does not trigger push workflows for that commit. Initial observations per source are not counted as new. On successful later snapshots missing postings are marked removed; reappearing postings retain first seen and reopen. Each source's raw data is kept in the repository. Scheduled runs can be delayed by GitHub.
 
 Run from the repository directory:
 
@@ -125,7 +125,7 @@ Lever's public postings API does not expose custom application questions; the pu
 | `sources.json` | Employer board configuration. |
 | `issues.py` | Create or update the daily change issue and close yesterday's issue. |
 | `data/raw/` | Compressed source responses, grouped by UTC date. |
-| `data/history.csv`, `data/status.json` | Rebuilt posting history and latest run status. |
+| `data/history.csv`, `data/status.json`, `data/feed.xml` | Rebuilt posting history, latest run status, and new-role RSS feed. |
 | `index.html`, `browse.html`, `market.html` | Today, Browse and Market pages. |
 | `common.js`, `today.js`, `browse.js`, `market.js` | Browser loading, interactions and history-derived calculations. |
 | `style.css`, `icon.svg`, `icon-192.png`, `icon-512.png` | Shared visual system and app icons. |
@@ -139,3 +139,5 @@ Lever's public postings API does not expose custom application questions; the pu
 Raw snapshots grow over time (approximately 3 MB per day in the initial week). For longer-term operation, older raw files could move to versioned release assets while retaining a reproducible archive. Millennium’s zero-result Workday feed is inactive pending validation of its current careers feed.
 
 A source that falls below half its previous good count is marked suspect, preserving the last snapshot. After confirming a genuine drop at the employer, set `accept_count_drop: true` on that source for one collection, then remove the override. The observed-date list in source health records saved snapshots; an absent date does not by itself prove an attempted check failed.
+
+Shortlist entries, application statuses, and notes stay in the current browser’s local storage. They are not synchronized between devices; export the shortlist to CSV for a portable copy. Workday multi-location detail lookups are best effort and may remain incomplete when an employer restricts them.
