@@ -743,3 +743,13 @@ def test_feed_excludes_initial_snapshot_and_escapes_text(tmp_path, monkeypatch):
     items = ElementTree.parse(tmp_path / "data/feed.xml").findall("./channel/item")
     assert len(items) == 1
     assert items[0].findtext("title") == "Research & Analysis — Firm"
+
+
+def test_retry_after_header_is_respected():
+    import urllib.error
+    from email.message import Message
+
+    headers = Message()
+    headers["Retry-After"] = "45"
+    error = urllib.error.HTTPError("https://example.com", 429, "limited", headers, None)
+    assert watcher.retry_after_seconds(error) == 45
