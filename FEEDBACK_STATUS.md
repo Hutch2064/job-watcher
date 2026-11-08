@@ -75,9 +75,10 @@ feature feedback, plus the personal email digest added afterward.
 - Source-health panel, recent saved-observation strip and labeled GitHub anomaly alerts.
 - A new-role RSS feed with no sending credential requirement.
 - A plain-language Methods page linked from the site and README.
-- A professional personal HTML/plain-text email with direct application links,
-  explainable ranking and duplicate-send safeguards. It waits for a successful
-  daily workflow, checking every 15 minutes through the local app.
+- A professional personal HTML/plain-text email with up to five unseen roles,
+  direct application links, explainable ranking and duplicate-send safeguards.
+  A GitHub Actions workflow calls Resend after the daily workflow succeeds,
+  with an hourly recovery check. The former local Codex sender was removed.
 - The email is now restricted to remote roles or Texas locations, including
   multi-location postings that offer Texas. Explicitly incompatible remote
   geography and hybrid roles outside Texas are excluded. The public Browse
@@ -87,8 +88,9 @@ feature feedback, plus the personal email digest added afterward.
 
 - Millennium's current replacement JSON feed has not been verified.
 - Retired Vise records are preserved as last-known history and can overlap the current feed.
-- The email checker requires the computer and app to be running. A separate
-  provider credential is needed for direct cloud delivery while the computer is off.
+- An uncertain provider attempt is retried with the same idempotency key for
+  up to 23 hours. Older unresolved attempts require receipt reconciliation,
+  preventing a blind duplicate after the provider's 24-hour protection expires.
 - The ATS-specific Python module split remains unfinished.
 - Employer sparklines, historical source-failure markers on charts, slimmer
   page-specific datasets, a light theme, animated number changes and manifest

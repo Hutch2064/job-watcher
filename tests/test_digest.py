@@ -221,7 +221,7 @@ def test_outside_texas_restricted_or_unclear_remote_is_excluded(
     )
 
 
-def test_location_is_a_hard_filter_before_the_top_two_are_selected():
+def test_location_is_a_hard_filter_before_the_shortlist_is_selected():
     rows = [
         job(location="New York, NY", posting_id="a:ny"),
         job(location="Toronto, Canada", posting_id="a:ca"),
@@ -254,3 +254,40 @@ def test_claim_rechecks_location_policy_before_email_is_sent(tmp_path):
     with pytest.raises(ValueError, match="remote-or-Texas"):
         digest.claim(tmp_path, result["digest_id"])
     assert digest.read_state(tmp_path)["pending"]["status"] == "reserved"
+
+
+def test_top_five_limit_keeps_score_order_and_filters_without_padding():
+    rows = [
+        job(
+            posting_id=f"a:{index}",
+            title=f"Portfolio Construction Analyst {index}",
+            url=f"https://example.com/jobs/{index}",
+        )
+        for index in range(8)
+    ]
+    selected = digest.select_jobs(rows, status(), sent_ids=["a:0"])
+    assert len(selected) == 5
+    assert [row["posting_id"] for row in selected] == [f"a:{i}" for i in range(1, 6)]
+    assert len(digest.select_jobs(rows[:3], status(), sent_ids=["a:0"])) == 2
+    assert not digest.select_jobs([job(location="London, UK")], status())
+
+
+@pytest.mark.parametrize(
+    "count,word",
+    [
+        (0, "No new"),
+        (1, "One role"),
+        (2, "Two roles"),
+        (3, "Three roles"),
+        (4, "Four roles"),
+        (5, "Five roles"),
+    ],
+)
+def test_email_heading_handles_zero_through_five_roles(count, word):
+    rows = [
+        digest.rank_job(job(posting_id=f"a:{index}"), DAY) for index in range(count)
+    ]
+    _, html, plain = digest.email_content(rows, DAY, status()["run_time"])
+    assert word in html
+    assert word.lower() in plain
+    assert html.count("View role &amp; apply") == count

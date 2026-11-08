@@ -1,83 +1,112 @@
 # Personal daily shortlist
 
-The private digest selects up to two unseen, open early-career roles after a
-successful **Daily job watch** update. It includes direct employer application
-links, the source location, the experience evidence, a short duties excerpt and
-an explainable score. It sends fewer than two rather than filling the email
-with unqualified matches. When none qualify, it sends a short no-match update.
+After a successful **Daily job watch** update, GitHub Actions emails up to
+**five** unseen early-career investment roles directly through Resend. Each
+role includes an employer application link, location, experience evidence,
+short duties excerpt and explainable score. The professional template provides
+both HTML and plain-text alternatives.
 
-## Ranking
+Delivery runs in GitHub's cloud while the computer and desktop app are closed.
+The former Codex/Gmail automation has been removed. Python performs selection,
+formatting, sending and receipt handling without an AI runtime.
 
-The score is a discovery ranking, not an eligibility decision or a hiring
-probability. It has four components:
+## Ranking and location
 
 | Component | Maximum | Evidence |
 |---|---:|---|
 | Career fit | 50 | Portfolio construction and allocation lead, followed by portfolio research, investment research and investment decision support. |
 | Experience | 35 | Internships and a stated minimum of zero or one year lead; a minimum of two years scores slightly lower. |
-| Duties | 10 | An analytical responsibility connected to portfolios, investments, securities, funds, trading or investment performance. |
-| Recency | 5 | When the tracker first observed the opening; this is not necessarily its original posting date. |
+| Duties | 10 | Analytical work involving portfolios, investments, securities, funds, trading or investment performance. |
+| Recency | 5 | When the tracker first observed the opening. |
 
-Only roles with an early-career signal are eligible. Senior titles, roles
-classified as experienced, MBA/PhD-specific title tracks without known
-eligibility, invalid application links, stale observations and inactive sources
-are excluded. Generic infrastructure and platform-support titles receive a
-lower career-fit score. The minimum score is 65. The email is limited to **remote roles or roles with a
-Texas location**. Texas can be one of several locations. Exact city-only labels
-for Austin, Dallas, Houston, San Antonio and Fort Worth are recognized; a
-contrary state qualifier (such as Austin, MN) is not treated as Texas. Remote roles explicitly
-restricted to another state or country and hybrid roles outside Texas are
-excluded; a generic remote label is accepted, subject to employer confirmation
-of location and work-authorization requirements. Unclear locations are excluded.
-This restriction applies to the email shortlist; Browse retains the full watchlist.
+Only open roles with an early-career signal qualify. The threshold is 65/100.
+Senior roles, MBA/PhD-specific title tracks, stale observations, inactive
+sources, invalid application links and previously emailed posting IDs are
+excluded. Closely duplicated titles and application URLs appear once.
 
-A successful source check on the update's UTC date is required. The script
-reads status and history at one GitHub commit and verifies that the collection
-timestamp falls within a completed, successful daily workflow. It waits if the
-workflow is still running or failed. Snapshots older than 36 hours are not used.
+Every role must be **remote or offer a Texas location**. Multi-location
+postings qualify when Texas is one option. Exact city-only labels for Austin,
+Dallas, Houston, San Antonio and Fort Worth are recognized. A contrary state
+qualifier such as Austin, MN does not qualify. Remote jobs restricted to
+another state or country, hybrids outside Texas and unclear locations are
+excluded. Generic remote listings are accepted with a reminder to confirm
+the employer's location restrictions.
 
-## Delivery
+The digest sends fewer than five when fewer qualify. With no unseen qualifying
+roles, it sends a brief no-match update. Scores rank discovery fit; employers
+determine applicant eligibility. Browse retains the full geographic watchlist.
 
-The connected Gmail account is used by a scheduled task in this chat. The task
-checks for completion every 15 minutes, sends after a successful update is
-detected, and sends at most once per UTC update day. It is not an immediate
-GitHub email hook. The computer and desktop app must be running for this local
-scheduled task; a provider credential would be required for a separate delivery
-worker that runs while the computer is off.
+## Cloud delivery
 
-Recipient configuration, MIME content and message receipts live in the ignored
-`.digest-local/` directory, with private file permissions. None is deployed to
-GitHub Pages. The Python program prepares content but never sends email on its
-own. The scheduled task uses the connected Gmail sending tool and records its
-message ID only after a successful response.
-
-Before every send the task searches Sent mail for the exact dated subject. A
-pending send with an unknown outcome is reconciled against Gmail; it is never
-blindly resent. Previously delivered posting IDs are excluded from later
-shortlists. The backup daily collection does not produce a second email for
-the same UTC date. Email has both HTML and plain-text MIME parts, uses inline
-styling, and has no remote fonts, tracking pixel or external image dependency.
-
-## Commands
-
-```bash
-# Configure the recipient locally, fetch one verified remote snapshot and reserve it.
-python3 digest.py prepare --recipient YOUR_EMAIL
-
-# Later runs reuse the private recipient config.
-python3 digest.py prepare
-
-# Mark a reservation as sending immediately before the Gmail call.
-python3 digest.py claim --digest-id ID
-
-# After Gmail returns a message ID, persist the receipt.
-python3 digest.py confirm --digest-id ID --message-id GMAIL_MESSAGE_ID
-
-# A never-sent reservation can be discarded. Sending attempts cannot.
-python3 digest.py discard --digest-id ID
+```mermaid
+flowchart LR
+  A[Successful daily update] --> B[GitHub Actions digest workflow]
+  B --> C[Verified snapshot and deterministic ranking]
+  C --> D[Private durable outbox]
+  D --> E[Resend: HTML and plain text]
+  E --> F[Private delivery receipt]
 ```
 
-`prepare` reports `ready`, `reconcile`, or `skip`. It avoids re-downloading the
-history after that update date has been sent. `tests/test_digest.py` covers
-ranking, stale/senior exclusions, source escaping and duplicate protection.
-The browser test renders a source-backed email preview and checks mobile width.
+`.github/workflows/digest.yml` runs after **Daily job watch** completes
+successfully on `main`. An hourly backup recovers delayed events and transient
+delivery failures. The script independently verifies the data timestamp falls
+within a completed successful daily run, reads status and history at one fixed
+commit, requires current successful source checks and rejects snapshots older
+than 36 hours.
+
+One digest is allowed per UTC **data-update date**, including when the backup
+collection succeeds the same day. Existing sent dates and posting IDs were
+migrated from the previous sender, preserving duplicate protection.
+
+## Private configuration and receipts
+
+The public repository's Actions secrets contain:
+
+- `RESEND_API_KEY`: dedicated sending-only provider key.
+- `DIGEST_FROM`: sender on an existing verified domain.
+- `DIGEST_TO`: the sole recipient.
+- `DIGEST_STATE_SSH_KEY`: write access to the separate private history repository.
+
+`Hutch2064/job-watcher-delivery` is a **private** Git repository holding the
+outbox, exact request content and delivery receipts. It is checked out only by
+the delivery workflow with its own repository-scoped deploy key. Missing or
+invalid history stops delivery. Recipient addresses, content, message IDs,
+credentials and the private checkout are excluded from Pages and public logs.
+
+The exact outgoing request and a sending reservation are pushed to private
+history **before** the provider is called. After provider acceptance, its
+message ID is saved and pushed. A failed pre-send push prevents sending.
+
+Retries use an identical request and a stable per-day idempotency key. Resend
+retains these keys for 24 hours, so automatic recovery is limited to 23 hours.
+If a response or receipt push is uncertain, the next workflow safely recovers
+the same provider ID inside that window. An older unresolved attempt stops
+for provider-receipt reconciliation instead of blindly sending again.
+GitHub reports workflow failures through its normal Actions notifications.
+
+## Verification and maintenance
+
+```bash
+# Exercise the cloud worker against the real private history without sending.
+gh workflow run digest.yml -f dry_run=true
+
+# Verify real provider delivery and duplicate protection using its simulator.
+gh workflow run digest.yml -f dry_run=true -f verify_provider=true
+
+# Run the worker normally; already-delivered UTC dates are skipped.
+gh workflow run digest.yml
+
+# Run ranking, geography, template, persistence and delivery-recovery tests.
+python3 -m pytest -q
+```
+
+`digest.py` remains the deterministic ranking/template library and provides
+local preparation and receipt commands for maintenance. `cloud_digest.py`
+handles direct provider delivery and the private outbox. No model or connected
+Gmail tool participates in scheduled delivery.
+
+Tests cover the five-role cap, score ordering, geography, prior deliveries,
+MIME alternatives, required state persistence, uncertain outcomes, identical
+idempotent retries and expired retry refusal. CI also checks the email layout
+at desktop and mobile widths. Provider simulation uses Resend's documented
+test-delivery address without sending an extra daily digest to the recipient.

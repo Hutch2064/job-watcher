@@ -1,8 +1,7 @@
-"""Rank current early-career investment roles and prepare a private Gmail digest.
+"""Rank early-career investment roles and prepare a private daily digest.
 
-This program never sends mail. A connected-Gmail scheduled task sends its MIME
-payload and records the resulting message ID with ``confirm``. Recipient and
-send receipts live in the ignored local state directory, not on GitHub Pages.
+``cloud_digest.py`` sends this deterministic content through Resend in GitHub
+Actions. Delivery receipts are retained in a separate private repository.
 """
 
 from __future__ import annotations
@@ -27,7 +26,8 @@ ROOT = Path(__file__).resolve().parent
 REPOSITORY = "Hutch2064/job-watcher"
 SITE = "https://hutch2064.github.io/job-watcher/"
 DEFAULT_STATE = ROOT / ".digest-local"
-VERSION = 2
+VERSION = 3
+MAXIMUM_JOBS = 5
 MINIMUM_SCORE = 65
 ROUTES = [
     (
@@ -285,7 +285,7 @@ def select_jobs(rows, status, sent_ids=()):
         chosen.append(row)
         identities.add(identity)
         urls.add(row["url"])
-        if len(chosen) == 2:
+        if len(chosen) == MAXIMUM_JOBS:
             break
     return chosen
 
@@ -294,14 +294,11 @@ def email_content(jobs, day, source_time):
     date_label = datetime.fromisoformat(day).strftime("%B %-d, %Y")
     count = len(jobs)
     subject = f"Fieldnote | Investment shortlist - {day}"
+    number_words = {1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five"}
     intro = (
-        "Two roles worth a closer look."
-        if count == 2
-        else (
-            "One role worth a closer look."
-            if count
-            else "No new qualifying matches today."
-        )
+        f"{number_words[count]} {'role' if count == 1 else 'roles'} worth a closer look."
+        if count
+        else "No new qualifying matches today."
     )
     preheader = (
         " · ".join(f"{job['employer']}: {job['title']}" for job in jobs)
@@ -543,11 +540,13 @@ def claim(directory, digest_id):
         or pending["status"] != "reserved"
     ):
         raise ValueError(
-            "No matching unsent reservation; reconcile Gmail before retrying"
+            "No matching unsent reservation; reconcile delivery before retrying"
         )
     selection = json.loads((directory / "selection.json").read_text())
-    if selection.get("version") != VERSION or any(
-        not location_eligibility(job) for job in selection["jobs"]
+    if (
+        selection.get("version") != VERSION
+        or len(selection["jobs"]) > MAXIMUM_JOBS
+        or any(not location_eligibility(job) for job in selection["jobs"])
     ):
         raise ValueError(
             "The reserved digest does not meet the current remote-or-Texas policy; discard an unsent reservation and prepare again"
@@ -581,10 +580,11 @@ def confirm(directory, digest_id, message_id):
     state = read_state(directory)
     pending = state.get("pending")
     if not pending or pending["digest_id"] != digest_id or not message_id.strip():
-        raise ValueError("A matching digest and Gmail message ID are required")
+        raise ValueError("A matching digest and provider message ID are required")
     state["sent_dates"][pending["day"]] = {
         "digest_id": digest_id,
         "message_id": message_id,
+        "provider": pending.get("provider", "gmail"),
         "workflow_run_id": pending["workflow_run_id"],
         "sent_at": datetime.now(timezone.utc).isoformat(),
     }

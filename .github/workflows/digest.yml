@@ -1,0 +1,75 @@
+name: Investment email digest
+
+on:
+  workflow_run:
+    workflows: [Daily job watch]
+    types: [completed]
+    branches: [main]
+  schedule:
+    # Recover a delayed trigger or retry a transient provider/push failure.
+    - cron: '53 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Verify the completed update and private history without sending
+        type: boolean
+        default: false
+      verify_provider:
+        description: Test provider delivery and idempotency using Resend's simulator
+        type: boolean
+        default: false
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: investment-email-digest
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    if: >-
+      github.repository == 'Hutch2064/job-watcher' &&
+      (github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out trusted application source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check out private delivery history
+        uses: actions/checkout@v4
+        with:
+          repository: Hutch2064/job-watcher-delivery
+          ssh-key: ${{ secrets.DIGEST_STATE_SSH_KEY }}
+          path: _digest-state
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify provider delivery using its simulator
+        if: ${{ inputs.verify_provider == true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: python tests/verify_cloud_delivery.py --state-dir _digest-state
+      - name: Send up to five qualifying jobs after a verified daily update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DIGEST_TO: ${{ secrets.DIGEST_TO }}
+          DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            python cloud_digest.py --state-dir _digest-state --dry-run
+          else
+            python cloud_digest.py --state-dir _digest-state
+          fi
