@@ -22,8 +22,14 @@ Only roles with an early-career signal are eligible. Senior titles, roles
 classified as experienced, MBA/PhD-specific title tracks without known
 eligibility, invalid application links, stale observations and inactive sources
 are excluded. Generic infrastructure and platform-support titles receive a
-lower career-fit score. The minimum score is 65. No geographic restriction is
-applied; location and work authorization must be reviewed with the employer.
+lower career-fit score. The minimum score is 65. The email is limited to **remote roles or roles with a
+Texas location**. Texas can be one of several locations. Exact city-only labels
+for Austin, Dallas, Houston, San Antonio and Fort Worth are recognized; a
+contrary state qualifier (such as Austin, MN) is not treated as Texas. Remote roles explicitly
+restricted to another state or country and hybrid roles outside Texas are
+excluded; a generic remote label is accepted, subject to employer confirmation
+of location and work-authorization requirements. Unclear locations are excluded.
+This restriction applies to the email shortlist; Browse retains the full watchlist.
 
 A successful source check on the update's UTC date is required. The script
 reads status and history at one GitHub commit and verifies that the collection

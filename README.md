@@ -147,3 +147,5 @@ Vise’s Ashby feed begins a new source baseline. Its retired Greenhouse posting
 ## Personal email digest
 
 The optional [daily shortlist](DIGEST.md) ranks up to two current early-career investment roles after a successful daily update. It uses a private recipient configuration and connected Gmail delivery through a scheduled task; no address or send receipt is published on the site.
+
+The [review follow-up checklist](FEEDBACK_STATUS.md) lists the implemented changes and remaining limitations. The personal email shortlist is restricted to remote or Texas roles.

@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent
 REPOSITORY = "Hutch2064/job-watcher"
 SITE = "https://hutch2064.github.io/job-watcher/"
 DEFAULT_STATE = ROOT / ".digest-local"
-VERSION = 1
+VERSION = 2
 MINIMUM_SCORE = 65
 ROUTES = [
     (
@@ -90,8 +90,64 @@ def safe_url(value):
     )
 
 
+TEXAS_CITIES = {"austin", "dallas", "houston", "san antonio", "fort worth"}
+TEXAS_LOCATION = re.compile(r"\b(?:texas|tx)\b", re.I)
+TEXAS_EXCLUDED = re.compile(
+    r"\b(?:except|excluding|excludes|not available in|not eligible in|cannot work in)\s+(?:texas|tx)\b"
+    r"|\b(?:texas|tx)\s+(?:excluded|not eligible|not supported)\b",
+    re.I,
+)
+REMOTE_WORD = re.compile(
+    r"\b(?:remote|work[ -]from[ -]home|telework|telecommut(?:e|ing)|home[ -]based)\b",
+    re.I,
+)
+NOT_FULLY_REMOTE = re.compile(
+    r"\b(?:hybrid|on[ -]?site|in[ -]office|non[ -]?remote|not remote|no remote)\b|\bremote\s+(?:not available|not permitted)\b",
+    re.I,
+)
+BROAD_REMOTE_AREA = re.compile(
+    r"\b(?:united states(?: of america)?|u\.?s\.?a?\.?|nationwide|anywhere|worldwide|global|all states|fully|full[ -]time|work[ -]from[ -]home|telework|telecommut(?:e|ing)|home[ -]based|remote|location not specified)\b",
+    re.I,
+)
+
+
+def location_eligibility(row):
+    """Require Texas, or explicit remote work without an incompatible location.
+
+    A multi-location posting qualifies when Texas is one of the offered locations.
+    A generic remote label is accepted; remote jobs tied to a different state or
+    country, hybrid roles outside Texas and unclear locations are excluded.
+    """
+    location = " ".join(str(row.get("location") or "").split())
+    title = str(row.get("title") or "")
+    evidence = location + " " + title
+    if TEXAS_EXCLUDED.search(evidence):
+        return None
+    location_parts = re.split(r"\s*/\s*|;\s*|\s+\|\s+", location)
+    named_texas_city = any(
+        part.strip().casefold() in TEXAS_CITIES for part in location_parts
+    )
+    if TEXAS_LOCATION.search(location) or named_texas_city:
+        return {"kind": "texas", "label": "Texas location available"}
+    if NOT_FULLY_REMOTE.search(evidence):
+        return None
+    remote_flag = str(row.get("remote") or "").lower() == "true"
+    if not remote_flag and not REMOTE_WORD.search(evidence):
+        return None
+    # Named locations left after removing broad remote/US labels indicate a
+    # geographic restriction we cannot establish as compatible with Texas.
+    remainder = BROAD_REMOTE_AREA.sub("", location)
+    remainder = re.sub(r"[^\w]+", "", remainder)
+    if remainder:
+        return None
+    return {"kind": "remote", "label": "Remote"}
+
+
 def rank_job(row, day):
     """100-point discovery score: role 50, experience 35, duties 10, recency 5."""
+    geography = location_eligibility(row)
+    if not geography:
+        return None
     title = row.get("title", "")
     normalized = INTERNSHIP.sub(lambda match: " " + match.group() + " ", title)
     if row.get("status") != "open" or row.get("experience") != "early":
@@ -176,6 +232,7 @@ def rank_job(row, day):
     return {
         **row,
         "score": score,
+        "geography": geography,
         "route": route_name,
         "experience_label": experience_label,
         "breakdown": {
@@ -291,12 +348,12 @@ def email_content(jobs, day, source_time):
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f5f2;"><tr><td align="center" style="padding:28px 12px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid #dce5de;border-radius:8px;">
 <tr><td bgcolor="#142d22" style="padding:24px 32px;border-radius:8px 8px 0 0;border-bottom:3px solid #c8a86b;"><p style="margin:0;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#ffffff;">FIELDNOTE <span style="color:#b5c7bd;">/ DAILY SHORTLIST</span></p><p style="margin:8px 0 0;font-size:12px;color:#c0cec5;">{date_label}</p></td></tr>
-<tr><td style="padding:28px 32px 24px;"><p style="margin:0 0 9px;font-size:14px;color:#62746a;">Selected for Aidan</p><h1 style="margin:0 0 12px;font-size:28px;line-height:35px;font-weight:700;color:#142d22;">{intro}</h1><p style="margin:0;font-size:15px;line-height:24px;color:#506359;">Ranked for portfolio construction, investment research and an early-career start.</p></td></tr>
+<tr><td style="padding:28px 32px 24px;"><p style="margin:0 0 9px;font-size:14px;color:#62746a;">Selected for Aidan</p><h1 style="margin:0 0 12px;font-size:28px;line-height:35px;font-weight:700;color:#142d22;">{intro}</h1><p style="margin:0;font-size:15px;line-height:24px;color:#506359;">Remote or Texas roles, ranked for portfolio construction, investment research and an early-career start.</p></td></tr>
 {''.join(sections)}
-<tr><td style="padding:22px 32px;background:#f7f9f7;border-top:1px solid #e1e7e3;border-radius:0 0 8px 8px;"><p style="margin:0 0 10px;font-size:13px;line-height:21px;"><a href="{SITE}browse.html" style="color:#24553b;text-decoration:underline;">Explore all roles</a> &nbsp;·&nbsp; <a href="{SITE}methods.html" style="color:#24553b;text-decoration:underline;">How matching works</a></p><p style="margin:0;font-size:11px;line-height:18px;color:#748078;">Sources checked {escape(source_time[:10])} UTC. Scores are ranking signals, not hiring probabilities. Review location, work authorization, degree and application requirements with the employer. No geographic restriction is applied. Previously emailed roles are omitted.</p></td></tr>
+<tr><td style="padding:22px 32px;background:#f7f9f7;border-top:1px solid #e1e7e3;border-radius:0 0 8px 8px;"><p style="margin:0 0 10px;font-size:13px;line-height:21px;"><a href="{SITE}browse.html" style="color:#24553b;text-decoration:underline;">Explore all roles</a> &nbsp;·&nbsp; <a href="{SITE}methods.html" style="color:#24553b;text-decoration:underline;">How matching works</a></p><p style="margin:0;font-size:11px;line-height:18px;color:#748078;">Sources checked {escape(source_time[:10])} UTC. Scores are ranking signals, not hiring probabilities. Review location, work authorization, degree and application requirements with the employer. Location filter: remote or Texas. Remote work restrictions still need employer confirmation. Previously emailed roles are omitted.</p></td></tr>
 </table></td></tr></table></body></html>"""
     text.append(
-        f"\nExplore all roles: {SITE}browse.html\nScores rank relevance; they are not hiring probabilities. Check location, work authorization, degree and full requirements. No geographic restriction is applied. Previously emailed roles are omitted.\nSources checked {source_time[:10]} UTC."
+        f"\nExplore all roles: {SITE}browse.html\nScores rank relevance; they are not hiring probabilities. Check location, work authorization, degree and full requirements. Location filter: remote or Texas. Remote work restrictions still need employer confirmation. Previously emailed roles are omitted.\nSources checked {source_time[:10]} UTC."
     )
     return subject, html, "\n".join(text)
 
@@ -488,6 +545,13 @@ def claim(directory, digest_id):
         raise ValueError(
             "No matching unsent reservation; reconcile Gmail before retrying"
         )
+    selection = json.loads((directory / "selection.json").read_text())
+    if selection.get("version") != VERSION or any(
+        not location_eligibility(job) for job in selection["jobs"]
+    ):
+        raise ValueError(
+            "The reserved digest does not meet the current remote-or-Texas policy; discard an unsent reservation and prepare again"
+        )
     pending["status"] = "sending"
     write_state(directory, state)
     return {
@@ -544,6 +608,14 @@ def main():
     with (directory / "lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if args.command == "prepare":
+            state = read_state(directory)
+            pending = state.get("pending")
+            if pending and pending["status"] == "reserved":
+                selection = json.loads((directory / "selection.json").read_text())
+                if selection.get("version") != VERSION or any(
+                    not location_eligibility(job) for job in selection["jobs"]
+                ):
+                    discard(directory, pending["digest_id"])
             config_path = directory / "config.json"
             config = json.loads(config_path.read_text()) if config_path.exists() else {}
             recipient = args.recipient or config.get("recipient")

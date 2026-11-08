@@ -15,7 +15,7 @@ def job(**changes):
         source_id="1",
         employer="Example Investments",
         title="Portfolio Construction Analyst",
-        location="New York, NY",
+        location="Dallas, TX",
         url="https://example.com/jobs/1",
         status="open",
         in_role="true",
@@ -156,3 +156,101 @@ def test_portfolio_team_technology_does_not_outrank_direct_portfolio_work():
     )
     assert direct["score"] > support["score"]
     assert support["breakdown"]["role"] == 25
+
+
+@pytest.mark.parametrize(
+    "location",
+    [
+        "Dallas, TX",
+        "Austin, Texas",
+        "Downtown Austin, TX",
+        "New York, NY / Houston, TX",
+        "One Destiny Way, Westlake TX",
+        "Texas-Remote",
+        "Dallas",
+        "Austin / Charlotte",
+        "Fort Worth; New York",
+    ],
+)
+def test_texas_location_is_eligible_including_multilocation(location):
+    assert digest.location_eligibility(job(location=location))["kind"] == "texas"
+
+
+@pytest.mark.parametrize(
+    "location,remote",
+    [
+        ("Remote", "true"),
+        ("United States - Remote", "false"),
+        ("Remote, USA", "true"),
+        ("Remote (U.S.)", "true"),
+        ("", "true"),
+    ],
+)
+def test_broad_remote_location_is_eligible(location, remote):
+    assert (
+        digest.location_eligibility(job(location=location, remote=remote))["kind"]
+        == "remote"
+    )
+
+
+@pytest.mark.parametrize(
+    "location,title,remote",
+    [
+        ("New York, NY", "Portfolio Analyst", "false"),
+        ("New York, NY", "Portfolio Analyst (Remote)", "true"),
+        ("Toronto, Canada - Remote", "Portfolio Analyst", "true"),
+        ("Remote - California", "Portfolio Analyst", "true"),
+        ("Remote, QC, CAN / Remote, ON, CAN", "Portfolio Analyst", "true"),
+        ("Remote", "Portfolio Analyst (Hybrid Remote)", "true"),
+        ("Remote", "Portfolio Analyst (Not Remote)", "true"),
+        ("Remote, USA excluding TX", "Portfolio Analyst", "true"),
+        ("", "Portfolio Analyst", "false"),
+        ("Austin, MN", "Portfolio Analyst", "false"),
+        ("Dallas, Oregon", "Portfolio Analyst", "false"),
+    ],
+)
+def test_outside_texas_restricted_or_unclear_remote_is_excluded(
+    location, title, remote
+):
+    assert (
+        digest.location_eligibility(job(location=location, title=title, remote=remote))
+        is None
+    )
+    assert (
+        digest.rank_job(job(location=location, title=title, remote=remote), DAY) is None
+    )
+
+
+def test_location_is_a_hard_filter_before_the_top_two_are_selected():
+    rows = [
+        job(location="New York, NY", posting_id="a:ny"),
+        job(location="Toronto, Canada", posting_id="a:ca"),
+        job(location="Austin, TX", posting_id="a:tx"),
+        job(
+            location="Remote",
+            remote="true",
+            title="Investment Research Intern",
+            posting_id="a:remote",
+            url="https://example.com/jobs/remote",
+        ),
+    ]
+    assert {row["posting_id"] for row in digest.select_jobs(rows, status())} == {
+        "a:tx",
+        "a:remote",
+    }
+
+
+def test_claim_rechecks_location_policy_before_email_is_sent(tmp_path):
+    update = {
+        "status": status(),
+        "rows": [job()],
+        "commit": "abc",
+        "workflow_run_id": 123,
+    }
+    result = digest.prepare(tmp_path, "recipient@example.com", update)
+    selection = json.loads((tmp_path / "selection.json").read_text())
+    selection["jobs"][0]["location"] = "New York, NY"
+    (tmp_path / "selection.json").write_text(json.dumps(selection))
+    with pytest.raises(ValueError, match="remote-or-Texas"):
+        digest.claim(tmp_path, result["digest_id"])
+    assert digest.read_state(tmp_path)["pending"]["status"] == "reserved"
