@@ -1,7 +1,7 @@
 {
-  "run_time": "2026-11-08T23:49:32.790654Z",
+  "run_time": "2026-11-09T22:29:16.173585Z",
   "first_run_date": "2026-11-02",
-  "days_with_success": 7,
+  "days_with_success": 8,
   "successful_dates": [
     "2026-11-02",
     "2026-11-03",
@@ -9,18 +9,19 @@
     "2026-11-05",
     "2026-11-06",
     "2026-11-07",
-    "2026-11-08"
+    "2026-11-08",
+    "2026-11-09"
   ],
-  "open": 8713,
-  "new_today": 5,
-  "removed_today": 43,
+  "open": 8727,
+  "new_today": 244,
+  "removed_today": 249,
   "sources": [
     {
       "id": "blackrock",
       "name": "BlackRock",
       "ok": true,
-      "count": 274,
-      "last_success": "2026-11-08",
+      "count": 276,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -30,15 +31,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "invesco",
       "name": "Invesco",
       "ok": true,
-      "count": 212,
-      "last_success": "2026-11-08",
+      "count": 213,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -48,15 +50,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "fidelity",
       "name": "Fidelity",
       "ok": true,
-      "count": 853,
-      "last_success": "2026-11-08",
+      "count": 857,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -66,7 +69,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -74,7 +78,7 @@
       "name": "Dimensional",
       "ok": true,
       "count": 72,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -84,15 +88,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "troweprice",
       "name": "T. Rowe Price",
       "ok": true,
-      "count": 135,
-      "last_success": "2026-11-08",
+      "count": 134,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -101,15 +106,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "statestreet",
       "name": "State Street",
       "ok": true,
-      "count": 1167,
-      "last_success": "2026-11-08",
+      "count": 1164,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -119,15 +125,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "vanguard",
       "name": "Vanguard",
       "ok": true,
-      "count": 332,
-      "last_success": "2026-11-08",
+      "count": 326,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -137,7 +144,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -145,7 +153,7 @@
       "name": "Apollo",
       "ok": true,
       "count": 56,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -155,15 +163,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "point72",
       "name": "Point72",
       "ok": true,
-      "count": 201,
-      "last_success": "2026-11-08",
+      "count": 200,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -173,15 +182,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "bridgewater",
       "name": "Bridgewater Associates",
       "ok": true,
-      "count": 21,
-      "last_success": "2026-11-08",
+      "count": 20,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -191,7 +201,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -199,7 +210,7 @@
       "name": "Connor, Clark & Lunn",
       "ok": true,
       "count": 5,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -209,15 +220,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "tpg",
       "name": "TPG",
       "ok": true,
-      "count": 19,
-      "last_success": "2026-11-08",
+      "count": 14,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -227,15 +239,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "janestreet",
       "name": "Jane Street",
       "ok": true,
-      "count": 219,
-      "last_success": "2026-11-08",
+      "count": 220,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -245,15 +258,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "betterment",
       "name": "Betterment",
       "ok": true,
-      "count": 26,
-      "last_success": "2026-11-08",
+      "count": 25,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -263,15 +277,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "mangroup",
       "name": "Man Group",
       "ok": true,
-      "count": 72,
-      "last_success": "2026-11-08",
+      "count": 71,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -281,15 +296,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "aqr",
       "name": "AQR",
       "ok": true,
-      "count": 53,
-      "last_success": "2026-11-08",
+      "count": 52,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -299,7 +315,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -307,7 +324,7 @@
       "name": "WisdomTree UK",
       "ok": true,
       "count": 4,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -317,15 +334,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "thrivent",
       "name": "Thrivent",
       "ok": true,
-      "count": 316,
-      "last_success": "2026-11-08",
+      "count": 319,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -335,15 +353,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "neuberger",
       "name": "Neuberger Berman",
       "ok": true,
-      "count": 92,
-      "last_success": "2026-11-08",
+      "count": 93,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -352,15 +371,16 @@
         "2026-11-04",
         "2026-11-05",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "alliancebernstein",
       "name": "AllianceBernstein",
       "ok": true,
-      "count": 86,
-      "last_success": "2026-11-08",
+      "count": 87,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -370,15 +390,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "hartford",
       "name": "Hartford",
       "ok": true,
-      "count": 230,
-      "last_success": "2026-11-08",
+      "count": 223,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -388,15 +409,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "tiaa",
       "name": "TIAA / Nuveen",
       "ok": true,
-      "count": 165,
-      "last_success": "2026-11-08",
+      "count": 158,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -406,7 +428,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -414,7 +437,7 @@
       "name": "GMO",
       "ok": true,
       "count": 9,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -424,7 +447,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -432,7 +456,7 @@
       "name": "Harris | Oakmark",
       "ok": true,
       "count": 2,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -442,7 +466,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -450,7 +475,7 @@
       "name": "Avantis Investors",
       "ok": true,
       "count": 1,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -460,15 +485,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "capitalgroup",
       "name": "Capital Group",
       "ok": true,
-      "count": 176,
-      "last_success": "2026-11-08",
+      "count": 173,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -476,15 +502,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "pimco",
       "name": "PIMCO",
       "ok": true,
-      "count": 166,
-      "last_success": "2026-11-08",
+      "count": 160,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -492,15 +519,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "wellington",
       "name": "Wellington Management",
       "ok": true,
-      "count": 117,
-      "last_success": "2026-11-08",
+      "count": 112,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -508,15 +536,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "russell",
       "name": "Russell Investments",
       "ok": true,
-      "count": 47,
-      "last_success": "2026-11-08",
+      "count": 45,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -524,7 +553,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -532,7 +562,7 @@
       "name": "Fiera Capital",
       "ok": true,
       "count": 10,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -540,15 +570,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "pgim",
       "name": "PGIM / Prudential",
       "ok": true,
-      "count": 188,
-      "last_success": "2026-11-08",
+      "count": 189,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -556,7 +587,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -564,7 +596,7 @@
       "name": "Texas Permanent School Fund",
       "ok": true,
       "count": 5,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -572,7 +604,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -580,7 +613,7 @@
       "name": "Ontario Teachers Pension Plan",
       "ok": true,
       "count": 34,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -588,7 +621,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -596,7 +630,7 @@
       "name": "Ares Management",
       "ok": true,
       "count": 234,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -604,29 +638,31 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "manulife",
       "name": "Manulife",
       "ok": true,
-      "count": 616,
-      "last_success": "2026-11-08",
+      "count": 609,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-05",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "cambridgeassociates",
       "name": "Cambridge Associates",
       "ok": true,
-      "count": 45,
-      "last_success": "2026-11-08",
+      "count": 46,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -634,30 +670,32 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "bmo",
       "name": "BMO",
       "ok": true,
-      "count": 1027,
-      "last_success": "2026-11-08",
+      "count": 1082,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "athora",
       "name": "Athora",
       "ok": true,
-      "count": 5,
-      "last_success": "2026-11-08",
+      "count": 6,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -665,15 +703,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "jupiteram",
       "name": "Jupiter Asset Management",
       "ok": true,
-      "count": 14,
-      "last_success": "2026-11-08",
+      "count": 13,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -681,15 +720,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "nystrs",
       "name": "New York State Teachers Retirement System",
       "ok": true,
-      "count": 5,
-      "last_success": "2026-11-08",
+      "count": 3,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -697,7 +737,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -705,7 +746,7 @@
       "name": "CAAT Pension Plan",
       "ok": true,
       "count": 16,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -713,15 +754,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "brookfield",
       "name": "Brookfield",
       "ok": true,
-      "count": 143,
-      "last_success": "2026-11-08",
+      "count": 144,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -729,7 +771,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -737,7 +780,7 @@
       "name": "ICONIQ",
       "ok": true,
       "count": 15,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -745,7 +788,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -753,7 +797,7 @@
       "name": "Forteus / Numeus",
       "ok": true,
       "count": 1,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -761,7 +805,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -769,7 +814,7 @@
       "name": "Choreo",
       "ok": true,
       "count": 6,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -777,15 +822,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "starmountain",
       "name": "Star Mountain Capital",
       "ok": true,
-      "count": 9,
-      "last_success": "2026-11-08",
+      "count": 8,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -793,7 +839,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -801,7 +848,7 @@
       "name": "CAIS",
       "ok": true,
       "count": 14,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -809,7 +856,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -817,7 +865,7 @@
       "name": "CC&L Quantitative",
       "ok": true,
       "count": 8,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -825,7 +873,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -833,7 +882,7 @@
       "name": "Galvanize",
       "ok": true,
       "count": 5,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -841,15 +890,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "merceradvisors",
       "name": "Mercer Advisors",
       "ok": true,
-      "count": 96,
-      "last_success": "2026-11-08",
+      "count": 97,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -857,15 +907,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "icapital",
       "name": "iCapital",
       "ok": true,
-      "count": 219,
-      "last_success": "2026-11-08",
+      "count": 214,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -873,7 +924,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -881,7 +933,7 @@
       "name": "WisdomTree US",
       "ok": true,
       "count": 0,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -889,15 +941,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "epwealth",
       "name": "EP Wealth Advisors",
       "ok": true,
-      "count": 37,
-      "last_success": "2026-11-08",
+      "count": 39,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -905,7 +958,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -913,7 +967,7 @@
       "name": "Wealthfront",
       "ok": true,
       "count": 23,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -921,15 +975,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "globalx",
       "name": "Global X ETFs",
       "ok": true,
-      "count": 5,
-      "last_success": "2026-11-08",
+      "count": 4,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -937,7 +992,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -945,7 +1001,7 @@
       "name": "Range",
       "ok": true,
       "count": 66,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -953,7 +1009,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -961,7 +1018,7 @@
       "name": "Compound Planning",
       "ok": true,
       "count": 5,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -969,15 +1026,16 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "calamos",
       "name": "Calamos Investments",
       "ok": true,
-      "count": 13,
-      "last_success": "2026-11-08",
+      "count": 15,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -985,7 +1043,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -993,7 +1052,7 @@
       "name": "VanEck",
       "ok": true,
       "count": 40,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -1001,7 +1060,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -1009,7 +1069,7 @@
       "name": "American Century Investments",
       "ok": true,
       "count": 19,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
@@ -1017,7 +1077,8 @@
         "2026-11-05",
         "2026-11-06",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
@@ -1025,26 +1086,28 @@
       "name": "Vise",
       "ok": true,
       "count": 12,
-      "last_success": "2026-11-08",
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
       "id": "northerntrust",
       "name": "Northern Trust",
       "ok": true,
-      "count": 638,
-      "last_success": "2026-11-08",
+      "count": 642,
+      "last_success": "2026-11-09",
       "warning": "",
       "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-07",
-        "2026-11-08"
+        "2026-11-08",
+        "2026-11-09"
       ]
     },
     {
