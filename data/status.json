@@ -1,5 +1,5 @@
 {
-  "run_time": "2026-11-14T00:56:20.588038Z",
+  "run_time": "2026-11-14T18:15:13.618570Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 13,
   "successful_dates": [
@@ -17,19 +17,18 @@
     "2026-11-13",
     "2026-11-14"
   ],
-  "open": 8753,
-  "new_today": 25,
-  "removed_today": 14,
+  "open": 8708,
+  "new_today": 64,
+  "removed_today": 105,
   "sources": [
     {
       "id": "blackrock",
       "name": "BlackRock",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 276,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -42,18 +41,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "invesco",
       "name": "Invesco",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 204,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -66,18 +65,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "fidelity",
       "name": "Fidelity",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 895,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -90,18 +89,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "dimensional",
       "name": "Dimensional",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 71,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -114,18 +113,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "troweprice",
       "name": "T. Rowe Price",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 128,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -137,18 +136,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "statestreet",
       "name": "State Street",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 1179,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -161,18 +160,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "vanguard",
       "name": "Vanguard",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 317,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -185,18 +184,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "apollo",
       "name": "Apollo",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 54,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -209,7 +208,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
@@ -431,12 +431,11 @@
     {
       "id": "thrivent",
       "name": "Thrivent",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 316,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -449,18 +448,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "neuberger",
       "name": "Neuberger Berman",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 91,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -472,7 +471,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
@@ -502,12 +502,11 @@
     {
       "id": "hartford",
       "name": "Hartford",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 217,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -520,18 +519,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "tiaa",
       "name": "TIAA / Nuveen",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 172,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -544,7 +543,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
@@ -598,12 +598,11 @@
     {
       "id": "avantis",
       "name": "Avantis Investors",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 1,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-02",
         "2026-11-03",
@@ -616,18 +615,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "capitalgroup",
       "name": "Capital Group",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 158,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -638,18 +637,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "pimco",
       "name": "PIMCO",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 157,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -660,18 +659,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "wellington",
       "name": "Wellington Management",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 118,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -682,18 +681,18 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "russell",
       "name": "Russell Investments",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 42,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -704,7 +703,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
@@ -734,10 +734,10 @@
       "name": "PGIM / Prudential",
       "ok": false,
       "count": 0,
-      "error": "HTTP Error 521: <none>",
+      "error": "Expecting value: line 1 column 1 (char 0)",
       "suspect": false,
       "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -798,12 +798,11 @@
     {
       "id": "ares",
       "name": "Ares Management",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 239,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -814,14 +813,15 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "manulife",
       "name": "Manulife",
       "ok": true,
-      "count": 636,
+      "count": 618,
       "last_success": "2026-11-14",
       "warning": "",
       "consecutive_failures": 0,
@@ -840,12 +840,11 @@
     {
       "id": "cambridgeassociates",
       "name": "Cambridge Associates",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 47,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -856,14 +855,15 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
       "id": "bmo",
       "name": "BMO",
       "ok": true,
-      "count": 1062,
+      "count": 1037,
       "last_success": "2026-11-14",
       "warning": "",
       "consecutive_failures": 0,
@@ -971,12 +971,11 @@
     {
       "id": "brookfield",
       "name": "Brookfield",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 144,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -987,7 +986,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
@@ -1367,12 +1367,11 @@
     {
       "id": "americancentury",
       "name": "American Century Investments",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 20,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -1383,7 +1382,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
@@ -1408,12 +1408,11 @@
     {
       "id": "northerntrust",
       "name": "Northern Trust",
-      "ok": false,
-      "count": 0,
-      "error": "HTTP Error 521: <none>",
-      "suspect": false,
-      "last_success": "2026-11-13",
-      "consecutive_failures": 1,
+      "ok": true,
+      "count": 651,
+      "last_success": "2026-11-14",
+      "warning": "",
+      "consecutive_failures": 0,
       "observed_dates": [
         "2026-11-04",
         "2026-11-07",
@@ -1422,7 +1421,8 @@
         "2026-11-10",
         "2026-11-11",
         "2026-11-12",
-        "2026-11-13"
+        "2026-11-13",
+        "2026-11-14"
       ]
     },
     {
