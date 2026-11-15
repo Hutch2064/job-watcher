@@ -1,5 +1,5 @@
 {
-  "run_time": "2026-11-14T18:15:13.618570Z",
+  "run_time": "2026-11-14T23:58:58.609676Z",
   "first_run_date": "2026-11-02",
   "days_with_success": 13,
   "successful_dates": [
@@ -17,9 +17,9 @@
     "2026-11-13",
     "2026-11-14"
   ],
-  "open": 8708,
+  "open": 8693,
   "new_today": 64,
-  "removed_today": 105,
+  "removed_today": 121,
   "sources": [
     {
       "id": "blackrock",
@@ -144,7 +144,7 @@
       "id": "statestreet",
       "name": "State Street",
       "ok": true,
-      "count": 1179,
+      "count": 1171,
       "last_success": "2026-11-14",
       "warning": "",
       "consecutive_failures": 0,
@@ -168,7 +168,7 @@
       "id": "vanguard",
       "name": "Vanguard",
       "ok": true,
-      "count": 317,
+      "count": 314,
       "last_success": "2026-11-14",
       "warning": "",
       "consecutive_failures": 0,
@@ -360,7 +360,7 @@
       "id": "mangroup",
       "name": "Man Group",
       "ok": true,
-      "count": 66,
+      "count": 67,
       "last_success": "2026-11-14",
       "warning": "",
       "consecutive_failures": 0,
@@ -737,7 +737,7 @@
       "error": "Expecting value: line 1 column 1 (char 0)",
       "suspect": false,
       "last_success": "2026-11-13",
-      "consecutive_failures": 2,
+      "consecutive_failures": 3,
       "observed_dates": [
         "2026-11-04",
         "2026-11-05",
@@ -1409,7 +1409,7 @@
       "id": "northerntrust",
       "name": "Northern Trust",
       "ok": true,
-      "count": 651,
+      "count": 646,
       "last_success": "2026-11-14",
       "warning": "",
       "consecutive_failures": 0,
