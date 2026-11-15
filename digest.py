@@ -26,8 +26,8 @@ ROOT = Path(__file__).resolve().parent
 REPOSITORY = "Hutch2064/job-watcher"
 SITE = "https://hutch2064.github.io/job-watcher/"
 DEFAULT_STATE = ROOT / ".digest-local"
-VERSION = 3
-MAXIMUM_JOBS = 5
+VERSION = 4
+MAXIMUM_JOBS = 10
 MINIMUM_SCORE = 65
 ROUTES = [
     (
@@ -37,12 +37,12 @@ ROUTES = [
     ),
     (
         47,
-        r"portfolio (?:research|analyst|analytics|management analyst)|investment analytics|portfolio solutions",
+        r"portfolio (?:research|analyst|analytics|management|solutions|consulting|advis(?:or|ory))|investment (?:analytics|engineering|solutions)",
         "Portfolio research and analytics",
     ),
     (
         45,
-        r"quantitative (?:investment|research|analyst)|systematic invest|investment (?:research|strategy)|(?:equity|credit|fixed.income) research|(?:fund|manager|etf) research|due diligence",
+        r"quantitative (?:investment|research|analyst)|systematic invest|investment (?:research|strategy)|(?:equity|credit|fixed.income) research|(?:fund|manager|etf) research|due diligence|responsible investing|research\b.*\b(?:fixed income|equity|credit|investments?|funds?|etfs?)\b",
         "Investment research and selection",
     ),
     (
@@ -52,7 +52,7 @@ ROUTES = [
     ),
     (
         34,
-        r"performance (?:analyst|attribution)|investment risk|risk analyst|risk analytics",
+        r"performance (?:analyst|attribution)|investment risk|risk analyst|risk analytics|(?:analyst|associate)\b.*\b(?:investment risk|performance)\b",
         "Investment performance and risk",
     ),
     (
@@ -62,11 +62,11 @@ ROUTES = [
     ),
 ]
 INVESTMENT = re.compile(
-    r"\b(portfolios?|investments?|asset allocation|securities|equities|fixed.income|credit research|funds?|etfs?|managers?|benchmarks?|attribution|trading)\b",
+    r"\b(portfolios?|investments?|asset allocation|asset pricing|securities|equities|fixed.income|credit research|funds?|etfs?|managers?|benchmarks?|attribution|trading)\b",
     re.I,
 )
 ANALYTICAL = re.compile(
-    r"\b(analy[sz]\w*|research\w*|construct\w*|allocat\w*|optimi[sz]\w*|model\w*|evaluat\w*|assess\w*|backtest\w*|rebalanc\w*|attribut\w*|due diligence)\b",
+    r"\b(analy[sz]\w*|research\w*|construct\w*|allocat\w*|optimi[sz]\w*|model\w*|evaluat\w*|assess\w*|backtest\w*|rebalanc\w*|attribut\w*|recommend\w*|implement\w*|due diligence)\b",
     re.I,
 )
 DEGREE_TRACK = re.compile(r"\b(MBA|Ph\.?D\.?|doctoral|doctorate)\b", re.I)
@@ -149,7 +149,12 @@ def rank_job(row, day):
     if not geography:
         return None
     title = row.get("title", "")
-    normalized = INTERNSHIP.sub(lambda match: " " + match.group() + " ", title)
+    internship_normalized = INTERNSHIP.sub(
+        lambda match: " " + match.group() + " ", title
+    )
+    # ATS titles vary in punctuation and word order: "Analyst/Associate,
+    # Research (Fixed Income)" and "Investment/Strategy Research" are valid.
+    normalized = re.sub(r"[^a-z0-9]+", " ", internship_normalized.casefold()).strip()
     if row.get("status") != "open" or row.get("experience") != "early":
         return None
     if SENIOR.search(title) or EXCLUDE.search(title) or DEGREE_TRACK.search(title):
@@ -244,7 +249,7 @@ def rank_job(row, day):
     }
 
 
-def select_jobs(rows, status, sent_ids=()):
+def select_jobs(rows, status, sent_ids=(), *, include_previous=False):
     day = status["run_time"][:10]
     fresh_sources = {
         item["id"]
@@ -260,16 +265,18 @@ def select_jobs(rows, status, sent_ids=()):
         if (
             row.get("source") not in fresh_sources
             or row.get("last_seen") != day
-            or row.get("posting_id") in excluded
+            or (row.get("posting_id") in excluded and not include_previous)
         ):
             continue
         result = rank_job(row, day)
         if result:
+            result["previously_sent"] = row.get("posting_id") in excluded
             ranked.append(result)
     ranked.sort(
         key=lambda row: (
             -row["score"],
             -row["breakdown"]["role"],
+            row["previously_sent"],
             -datetime.fromisoformat(row["first_seen"]).timestamp(),
             row["posting_id"],
         )
@@ -290,23 +297,57 @@ def select_jobs(rows, status, sent_ids=()):
     return chosen
 
 
-def email_content(jobs, day, source_time):
+def digest_subject(day, edition="daily"):
+    if edition not in {"daily", "correction"}:
+        raise ValueError("Unknown digest edition")
+    label = (
+        "Corrected investment shortlist"
+        if edition == "correction"
+        else "Investment shortlist"
+    )
+    return f"Fieldnote | {label} - {day}"
+
+
+def email_content(jobs, day, source_time, *, edition="daily"):
     date_label = datetime.fromisoformat(day).strftime("%B %-d, %Y")
     count = len(jobs)
-    subject = f"Fieldnote | Investment shortlist - {day}"
-    number_words = {1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five"}
+    subject = digest_subject(day, edition)
+    number_words = {
+        1: "One",
+        2: "Two",
+        3: "Three",
+        4: "Four",
+        5: "Five",
+        6: "Six",
+        7: "Seven",
+        8: "Eight",
+        9: "Nine",
+        10: "Ten",
+    }
     intro = (
         f"{number_words[count]} {'role' if count == 1 else 'roles'} worth a closer look."
         if count
-        else "No new qualifying matches today."
+        else "No qualifying matches today."
     )
     preheader = (
         " · ".join(f"{job['employer']}: {job['title']}" for job in jobs)
         if jobs
-        else "The latest update did not produce an unseen match above your threshold."
+        else "The latest update has no current match above your threshold."
     )
     sections = []
     text = [f"FIELDNOTE / DAILY SHORTLIST\n{date_label}\n\nAidan, {intro.lower()}"]
+    correction_note = (
+        "This replaces today's earlier empty shortlist."
+        if edition == "correction"
+        else ""
+    )
+    if correction_note:
+        text.append(correction_note)
+    if jobs:
+        new_count = sum(not job.get("previously_sent", False) for job in jobs)
+        text.append(
+            f"{new_count} new to your digest; {count - new_count} previously emailed and still open."
+        )
     for index, job in enumerate(jobs, 1):
         e = escape
         cover = {
@@ -314,13 +355,19 @@ def email_content(jobs, day, source_time):
             "optional": "Cover letter optional",
         }.get(job.get("cover_letter"), "")
         details = f"{job['experience_label']} · {job.get('location') or 'Location not specified'}"
+        freshness = (
+            "Previously emailed · Still open"
+            if job.get("previously_sent")
+            else "New to your digest"
+        )
         breakdown = job["breakdown"]
         why = [job["route"], job.get("experience_reason") or job["experience_label"]]
         if job.get("duty_excerpt"):
             why.append(job["duty_excerpt"])
         sections.append(
             f"""<tr><td style="padding:26px 32px;border-top:1px solid #e1e7e3;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px;letter-spacing:1.1px;color:#596e63;font-weight:700;">0{index} &nbsp; {e(job['employer'])}</td><td align="right" style="font-size:13px;color:#315641;font-weight:700;white-space:nowrap;">{job['score']}/100 fit</td></tr></table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px;letter-spacing:1.1px;color:#596e63;font-weight:700;">{index:02d} &nbsp; {e(job['employer'])}</td><td align="right" style="font-size:13px;color:#315641;font-weight:700;white-space:nowrap;">{job['score']}/100 fit</td></tr></table>
+<p style="margin:10px 0 0;font-size:12px;line-height:18px;color:#506359;">{e(freshness)}</p>
 <h2 style="margin:12px 0 9px;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:29px;font-weight:700;color:#142d22;"><a href="{e(job['url'],quote=True)}" style="color:#142d22;text-decoration:none;">{e(job['title'])}</a></h2>
 <p style="margin:0 0 18px;font-size:13px;line-height:20px;color:#5c6b63;">{e(details)}{('<br>'+e(cover)) if cover else ''}</p>
 <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#263f31;">Why it made your shortlist</p>
@@ -331,26 +378,26 @@ def email_content(jobs, day, source_time):
 </td></tr>"""
         )
         text.append(
-            f"\n{index}. {job['title']}\n{job['employer']} | {details}\nFit score: {job['score']}/100\nWhy: {'; '.join(why)}\n"
+            f"\n{index}. {job['title']}\n{job['employer']} | {details}\n{freshness}\nFit score: {job['score']}/100\nWhy: {'; '.join(why)}\n"
             + (cover + "\n" if cover else "")
             + f"View role & apply: {job['url']}\n"
         )
     if not jobs:
         sections.append(
-            '<tr><td style="padding:26px 32px;border-top:1px solid #e1e7e3;font-size:15px;line-height:24px;color:#40554a;">The latest update has no unseen roles that clear your relevance and early-career filters. Your next digest will check again after the next daily update.</td></tr>'
+            '<tr><td style="padding:26px 32px;border-top:1px solid #e1e7e3;font-size:15px;line-height:24px;color:#40554a;">The latest update has no current roles that clear your relevance, location and early-career filters. Your next digest will check again after the next daily update.</td></tr>'
         )
-    html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>{escape(subject)}</title></head>
+    html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="fieldnote-job-count" content="{count}"><meta name="fieldnote-job-limit" content="{MAXIMUM_JOBS}"><title>{escape(subject)}</title></head>
 <body style="margin:0;padding:0;background:#f2f5f2;font-family:Arial,Helvetica,sans-serif;color:#1c3327;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f2f5f2;">{escape(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f5f2;"><tr><td align="center" style="padding:28px 12px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid #dce5de;border-radius:8px;">
 <tr><td bgcolor="#142d22" style="padding:24px 32px;border-radius:8px 8px 0 0;border-bottom:3px solid #c8a86b;"><p style="margin:0;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#ffffff;">FIELDNOTE <span style="color:#b5c7bd;">/ DAILY SHORTLIST</span></p><p style="margin:8px 0 0;font-size:12px;color:#c0cec5;">{date_label}</p></td></tr>
-<tr><td style="padding:28px 32px 24px;"><p style="margin:0 0 9px;font-size:14px;color:#62746a;">Selected for Aidan</p><h1 style="margin:0 0 12px;font-size:28px;line-height:35px;font-weight:700;color:#142d22;">{intro}</h1><p style="margin:0;font-size:15px;line-height:24px;color:#506359;">Remote or Texas roles, ranked for portfolio construction, investment research and an early-career start.</p></td></tr>
+<tr><td style="padding:28px 32px 24px;"><p style="margin:0 0 9px;font-size:14px;color:#62746a;">Selected for Aidan</p><h1 style="margin:0 0 12px;font-size:28px;line-height:35px;font-weight:700;color:#142d22;">{intro}</h1><p style="margin:0;font-size:15px;line-height:24px;color:#506359;">Remote or Texas roles, ranked for portfolio construction, investment research and an early-career start.</p>{('<p style="margin:12px 0 0;font-size:14px;line-height:22px;color:#506359;">'+escape(correction_note)+'</p>') if correction_note else ''}</td></tr>
 {''.join(sections)}
-<tr><td style="padding:22px 32px;background:#f7f9f7;border-top:1px solid #e1e7e3;border-radius:0 0 8px 8px;"><p style="margin:0 0 10px;font-size:13px;line-height:21px;"><a href="{SITE}browse.html" style="color:#24553b;text-decoration:underline;">Explore all roles</a> &nbsp;·&nbsp; <a href="{SITE}methods.html" style="color:#24553b;text-decoration:underline;">How matching works</a></p><p style="margin:0;font-size:11px;line-height:18px;color:#748078;">Sources checked {escape(source_time[:10])} UTC. Scores are ranking signals, not hiring probabilities. Review location, work authorization, degree and application requirements with the employer. Location filter: remote or Texas. Remote work restrictions still need employer confirmation. Previously emailed roles are omitted.</p></td></tr>
+<tr><td style="padding:22px 32px;background:#f7f9f7;border-top:1px solid #e1e7e3;border-radius:0 0 8px 8px;"><p style="margin:0 0 10px;font-size:13px;line-height:21px;"><a href="{SITE}browse.html" style="color:#24553b;text-decoration:underline;">Explore all roles</a> &nbsp;·&nbsp; <a href="{SITE}methods.html" style="color:#24553b;text-decoration:underline;">How matching works</a></p><p style="margin:0;font-size:11px;line-height:18px;color:#748078;">Sources checked {escape(source_time[:10])} UTC. Scores are ranking signals, not hiring probabilities. Review location, work authorization, degree and application requirements with the employer. Location filter: remote or Texas. Remote work restrictions still need employer confirmation. Previously emailed roles can appear while still open and are labeled.</p></td></tr>
 </table></td></tr></table></body></html>"""
     text.append(
-        f"\nExplore all roles: {SITE}browse.html\nScores rank relevance; they are not hiring probabilities. Check location, work authorization, degree and full requirements. Location filter: remote or Texas. Remote work restrictions still need employer confirmation. Previously emailed roles are omitted.\nSources checked {source_time[:10]} UTC."
+        f"\nExplore all roles: {SITE}browse.html\nScores rank relevance; they are not hiring probabilities. Check location, work authorization, degree and full requirements. Location filter: remote or Texas. Remote work restrictions still need employer confirmation. Previously emailed roles can appear while still open and are labeled.\nSources checked {source_time[:10]} UTC."
     )
     return subject, html, "\n".join(text)
 
@@ -434,7 +481,41 @@ def write_state(directory, state):
     write_private(directory / "state.json", json.dumps(state, indent=2) + "\n")
 
 
-def prepare(directory, recipient, update):
+def delivery_receipts(state, edition="daily"):
+    if edition == "daily":
+        return state["sent_dates"]
+    if edition == "correction":
+        return state.get("corrections", {})
+    raise ValueError("Unknown digest edition")
+
+
+def validate_empty_correction(directory, day):
+    """Allow one explicit replacement of a proven empty digest, preserving it."""
+    state = read_state(directory)
+    if day in state.get("corrections", {}):
+        raise ValueError("This update already has a corrected digest")
+    previous = state["sent_dates"].get(day)
+    if not previous:
+        raise ValueError(
+            "An empty digest must already have been delivered before correcting it"
+        )
+    count = previous.get("job_count")
+    if count is None:
+        # Older receipts did not save counts. The private selection is evidence
+        # only when it matches that exact original receipt and update date.
+        path = directory / "selection.json"
+        selection = json.loads(path.read_text()) if path.is_file() else {}
+        if (
+            selection.get("digest_id") != previous["digest_id"]
+            or selection.get("day") != day
+        ):
+            raise ValueError("No matching evidence that the original digest was empty")
+        count = len(selection["jobs"])
+    if count != 0:
+        raise ValueError("Refusing to replace a digest that already contained jobs")
+
+
+def prepare(directory, recipient, update, *, edition="daily"):
     state = read_state(directory)
     if state.get("pending"):
         pending = state["pending"]
@@ -451,14 +532,24 @@ def prepare(directory, recipient, update):
         }
     status = update["status"]
     day = status["run_time"][:10]
-    if day in state["sent_dates"]:
+    if day in delivery_receipts(state, edition):
         return {
             "action": "skip",
             "reason": "This UTC update day has already been emailed",
             "day": day,
         }
-    jobs = select_jobs(update["rows"], status, state["sent_job_ids"])
-    subject, html, plain = email_content(jobs, day, status["run_time"])
+    if edition == "correction":
+        validate_empty_correction(directory, day)
+    jobs = select_jobs(
+        update["rows"], status, state["sent_job_ids"], include_previous=True
+    )
+    if edition == "correction" and not jobs:
+        return {
+            "action": "skip",
+            "reason": "No qualifying jobs are available for a correction",
+            "day": day,
+        }
+    subject, html, plain = email_content(jobs, day, status["run_time"], edition=edition)
     digest_id = hashlib.sha256(
         (
             day + str(update["workflow_run_id"]) + recipient + subject + html + plain
@@ -490,6 +581,7 @@ def prepare(directory, recipient, update):
         json.dumps(
             {
                 "version": VERSION,
+                "edition": edition,
                 "day": day,
                 "digest_id": digest_id,
                 "workflow_run_id": update["workflow_run_id"],
@@ -502,6 +594,7 @@ def prepare(directory, recipient, update):
     )
     state["pending"] = {
         "digest_id": digest_id,
+        "edition": edition,
         "day": day,
         "workflow_run_id": update["workflow_run_id"],
         "subject": subject,
@@ -581,10 +674,19 @@ def confirm(directory, digest_id, message_id):
     pending = state.get("pending")
     if not pending or pending["digest_id"] != digest_id or not message_id.strip():
         raise ValueError("A matching digest and provider message ID are required")
-    state["sent_dates"][pending["day"]] = {
+    edition = pending.get("edition", "daily")
+    receipts = (
+        state["sent_dates"]
+        if edition == "daily"
+        else state.setdefault("corrections", {})
+    )
+    receipts[pending["day"]] = {
         "digest_id": digest_id,
         "message_id": message_id,
         "provider": pending.get("provider", "gmail"),
+        "job_count": len(pending["job_ids"]),
+        "job_ids": pending["job_ids"],
+        "selection_version": VERSION,
         "workflow_run_id": pending["workflow_run_id"],
         "sent_at": datetime.now(timezone.utc).isoformat(),
     }

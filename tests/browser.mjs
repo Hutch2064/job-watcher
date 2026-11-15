@@ -63,7 +63,20 @@ try {
   await page.setViewportSize({ width: 760, height: 1100 });
   await page.goto("http://127.0.0.1:8765/email-preview.html");
   await page.getByRole("heading", { level: 1 }).waitFor();
-  assert.ok((await page.getByRole("heading", { level: 2 }).count()) <= 2);
+  const expectedJobs = Number(
+    await page.locator('meta[name="fieldnote-job-count"]').getAttribute("content"),
+  );
+  const maximumJobs = Number(
+    await page.locator('meta[name="fieldnote-job-limit"]').getAttribute("content"),
+  );
+  assert.ok(Number.isInteger(expectedJobs) && expectedJobs >= 0);
+  assert.equal(maximumJobs, 10);
+  assert.ok(expectedJobs <= maximumJobs);
+  assert.equal(await page.getByRole("heading", { level: 2 }).count(), expectedJobs);
+  assert.equal(
+    await page.getByRole("link", { name: /View role.*apply/ }).count(),
+    expectedJobs,
+  );
   await page.screenshot({ path: "digest-preview.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(

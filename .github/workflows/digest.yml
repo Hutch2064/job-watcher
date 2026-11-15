@@ -18,6 +18,10 @@ on:
         description: Test provider delivery and idempotency using Resend's simulator
         type: boolean
         default: false
+      correct_empty_digest:
+        description: Send one clearly marked replacement for a proven empty digest
+        type: boolean
+        default: false
 
 permissions:
   actions: read
@@ -60,16 +64,20 @@ jobs:
           DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: python tests/verify_cloud_delivery.py --state-dir _digest-state
-      - name: Send up to five qualifying jobs after a verified daily update
+      - name: Send up to ten current matches after a verified daily update
         env:
           GH_TOKEN: ${{ github.token }}
           DIGEST_TO: ${{ secrets.DIGEST_TO }}
           DIGEST_FROM: ${{ secrets.DIGEST_FROM }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DRY_RUN: ${{ inputs.dry_run }}
+          CORRECT_EMPTY_DIGEST: ${{ inputs.correct_empty_digest }}
         run: |
+          options=()
           if [ "$DRY_RUN" = "true" ]; then
-            python cloud_digest.py --state-dir _digest-state --dry-run
-          else
-            python cloud_digest.py --state-dir _digest-state
+            options+=(--dry-run)
           fi
+          if [ "$CORRECT_EMPTY_DIGEST" = "true" ]; then
+            options+=(--correct-empty-digest)
+          fi
+          python cloud_digest.py --state-dir _digest-state "${options[@]}"

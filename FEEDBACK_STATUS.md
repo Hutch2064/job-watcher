@@ -75,10 +75,11 @@ feature feedback, plus the personal email digest added afterward.
 - Source-health panel, recent saved-observation strip and labeled GitHub anomaly alerts.
 - A new-role RSS feed with no sending credential requirement.
 - A plain-language Methods page linked from the site and README.
-- A professional personal HTML/plain-text email with up to five unseen roles,
+- A professional personal HTML/plain-text email with up to ten current roles,
   direct application links, explainable ranking and duplicate-send safeguards.
   A GitHub Actions workflow calls Resend after the daily workflow succeeds,
-  with an hourly recovery check. The former local Codex sender was removed.
+  with an hourly recovery check. Previously emailed still-open matches stay
+  eligible and are labeled. The former local Codex sender was removed.
 - The email is now restricted to remote roles or Texas locations, including
   multi-location postings that offer Texas. Explicitly incompatible remote
   geography and hybrid roles outside Texas are excluded. The public Browse

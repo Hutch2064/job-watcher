@@ -146,6 +146,6 @@ Vise’s Ashby feed begins a new source baseline. Its retired Greenhouse posting
 
 ## Personal email digest
 
-The [daily shortlist](DIGEST.md) ranks up to five unseen early-career investment roles after a successful daily update. GitHub Actions sends the professional HTML/plain-text email directly through Resend. Delivery continues while your computer is off; credentials and recipient settings are GitHub secrets, and delivery history lives in a separate private repository.
+The [daily shortlist](DIGEST.md) ranks up to ten current early-career investment roles after a successful daily update. GitHub Actions sends the professional HTML/plain-text email directly through Resend. New and previously emailed still-open matches are labeled. Delivery continues while your computer is off; credentials and recipient settings are GitHub secrets, and delivery history lives in a separate private repository.
 
 The [review follow-up checklist](FEEDBACK_STATUS.md) lists the implemented changes and remaining limitations. The personal email shortlist is restricted to remote or Texas roles.

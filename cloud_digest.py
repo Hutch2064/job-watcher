@@ -128,8 +128,9 @@ def provider_payload(directory, recipient, sender):
         or selection.get("digest_id") != pending["digest_id"]
         or selection.get("version") != digest.VERSION
         or selection.get("day") != pending["day"]
+        or selection.get("edition", "daily") != pending.get("edition", "daily")
         or delivery.get("subject")
-        != f"Fieldnote | Investment shortlist - {pending['day']}"
+        != digest.digest_subject(pending["day"], pending.get("edition", "daily"))
     ):
         raise ValueError(
             "Reserved content does not match the private delivery reservation"
@@ -138,7 +139,7 @@ def provider_payload(directory, recipient, sender):
     if len(jobs) > digest.MAXIMUM_JOBS or any(
         not digest.location_eligibility(job) for job in jobs
     ):
-        raise ValueError("Reserved jobs fail the five-role remote-or-Texas policy")
+        raise ValueError("Reserved jobs fail the ten-role remote-or-Texas policy")
     mime = delivery["payload"]
     parts = mime.get("parts", [])
     if (
@@ -203,6 +204,7 @@ def run(
     api_key,
     *,
     dry_run=False,
+    correct_empty=False,
     now=None,
     fetch_update=digest.remote_update,
     persist=persist_outbox,
@@ -211,24 +213,42 @@ def run(
     now = now or datetime.now(timezone.utc)
     state = load_delivery_state(directory)
     if not state.get("pending"):
-        update, reason = fetch_update(now=now, sent_dates=state["sent_dates"])
+        edition = "correction" if correct_empty else "daily"
+        update, reason = fetch_update(
+            now=now, sent_dates=digest.delivery_receipts(state, edition)
+        )
         if not update:
             return {"action": "skip", "reason": reason}
+        if update["status"]["run_time"][:10] in digest.delivery_receipts(
+            state, edition
+        ):
+            return {
+                "action": "skip",
+                "reason": "This UTC update day has already been emailed",
+            }
+        if correct_empty:
+            digest.validate_empty_correction(
+                directory, update["status"]["run_time"][:10]
+            )
         if dry_run:
             jobs = digest.select_jobs(
-                update["rows"], update["status"], state["sent_job_ids"]
+                update["rows"],
+                update["status"],
+                state["sent_job_ids"],
+                include_previous=True,
             )
             return {
                 "action": "dry-run",
                 "day": update["status"]["run_time"][:10],
                 "job_count": len(jobs),
             }
-        prepared = digest.prepare(directory, recipient, update)
+        prepared = digest.prepare(directory, recipient, update, edition=edition)
         if prepared["action"] == "skip":
             return {"action": "skip", "reason": prepared["reason"]}
     state = load_delivery_state(directory)
     pending = state["pending"]
-    if pending["day"] in state["sent_dates"]:
+    edition = pending.get("edition", "daily")
+    if pending["day"] in digest.delivery_receipts(state, edition):
         raise ValueError("A pending outbox conflicts with an existing sent-day receipt")
     payload = provider_payload(directory, recipient, sender)
     if dry_run:
@@ -245,9 +265,12 @@ def run(
         pending["first_attempt_at"] = now.isoformat()
         digest.write_state(directory, state)
         recipient_hash = hashlib.sha256(recipient.casefold().encode()).hexdigest()[:16]
+        idempotency_key = f"fieldnote/{pending['day']}/{recipient_hash}"
+        if edition == "correction":
+            idempotency_key += "/correction"
         envelope = {
             "digest_id": pending["digest_id"],
-            "idempotency_key": f"fieldnote/{pending['day']}/{recipient_hash}",
+            "idempotency_key": idempotency_key,
             "request": payload,
         }
         digest.write_private(
@@ -284,6 +307,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--correct-empty-digest", action="store_true")
     arguments = parser.parse_args()
     try:
         recipient, sender, api_key = configuration()
@@ -293,6 +317,7 @@ def main():
             sender,
             api_key,
             dry_run=arguments.dry_run,
+            correct_empty=arguments.correct_empty_digest,
         )
     except (
         ValueError,

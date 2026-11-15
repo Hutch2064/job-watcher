@@ -38,7 +38,7 @@ def update():
                 "first_seen": DAY,
                 "last_seen": DAY,
             }
-            for index in range(7)
+            for index in range(13)
         ],
     }
 
@@ -72,7 +72,7 @@ def execute(
     )
 
 
-def test_sends_five_with_durable_reservation_and_then_receipt(outbox):
+def test_sends_ten_with_durable_reservation_and_then_receipt(outbox):
     events = []
 
     def persist(directory):
@@ -87,19 +87,22 @@ def test_sends_five_with_durable_reservation_and_then_receipt(outbox):
         assert events == ["reserved", "send"]
         assert payload["to"] == [RECIPIENT]
         assert not {"cc", "bcc"} & payload.keys()
-        assert "Five roles" in payload["html"]
-        assert payload["html"].count("View role &amp; apply") == 5
+        assert "Ten roles" in payload["html"]
+        assert payload["html"].count("View role &amp; apply") == 10
         assert idempotency_key.startswith(f"fieldnote/{DAY}/")
         return MESSAGE_ID
 
     result = execute(outbox, persist=persist, send=send)
-    assert result == {"action": "sent", "day": DAY, "job_count": 5}
+    assert result == {"action": "sent", "day": DAY, "job_count": 10}
     assert events == ["reserved", "send", "confirmed"]
     state = digest.read_state(outbox)
     assert state["sent_dates"]["2026-11-08"]["message_id"] == "old-gmail-id"
     assert state["sent_dates"][DAY]["message_id"] == MESSAGE_ID
     assert state["sent_dates"][DAY]["provider"] == "resend"
-    assert state["sent_job_ids"] == [f"a:{index}" for index in range(6)]
+    assert set(state["sent_job_ids"]) == {"a:0"} | set(
+        sorted(f"a:{index}" for index in range(1, 13))[:10]
+    )
+    assert state["sent_dates"][DAY]["job_count"] == 10
     assert state["pending"] is None
     # Even a redundant same-day trigger cannot send again.
     assert (
@@ -224,7 +227,7 @@ def test_dry_run_does_not_modify_state_or_contact_provider(outbox):
         persist=lambda *args: pytest.fail("dry run wrote history"),
         send=lambda *args: pytest.fail("dry run sent mail"),
     )
-    assert result == {"action": "dry-run", "day": DAY, "job_count": 5}
+    assert result == {"action": "dry-run", "day": DAY, "job_count": 10}
     assert (outbox / "state.json").read_text() == before
     assert not (outbox / "provider.json").exists()
 
@@ -270,3 +273,117 @@ def test_provider_errors_keep_sensitive_details_out_of_logs(monkeypatch, failure
     with pytest.raises(RuntimeError) as error:
         cloud_digest.send_resend("test-key", {}, "one-day")
     assert "private address" not in str(error.value)
+
+
+def record_empty_delivery(outbox):
+    empty = update()
+    empty["rows"] = []
+    prepared = digest.prepare(outbox, RECIPIENT, empty)
+    digest.claim(outbox, prepared["digest_id"])
+    digest.confirm(outbox, prepared["digest_id"], MESSAGE_ID)
+    return digest.read_state(outbox)["sent_dates"][DAY].copy()
+
+
+def test_one_explicit_correction_preserves_original_empty_receipt(outbox):
+    original = record_empty_delivery(outbox)
+    calls = []
+    corrected_id = "d024436b-2dc6-4ce0-b2c6-a4142d8d5b26"
+
+    def send(key, payload, idempotency_key):
+        calls.append(idempotency_key)
+        assert idempotency_key.endswith("/correction")
+        assert (
+            payload["subject"] == f"Fieldnote | Corrected investment shortlist - {DAY}"
+        )
+        assert payload["html"].count("View role &amp; apply") == 10
+        assert payload["text"].count("View role & apply:") == 10
+        return corrected_id
+
+    assert execute(outbox, correct_empty=True, send=send)["job_count"] == 10
+    state = digest.read_state(outbox)
+    assert state["sent_dates"][DAY] == original
+    assert state["corrections"][DAY]["message_id"] == corrected_id
+    assert state["corrections"][DAY]["job_count"] == 10
+    assert (
+        execute(
+            outbox,
+            correct_empty=True,
+            send=lambda *args: pytest.fail("second correction"),
+        )["action"]
+        == "skip"
+    )
+    assert (
+        execute(outbox, send=lambda *args: pytest.fail("duplicate daily digest"))[
+            "action"
+        ]
+        == "skip"
+    )
+    assert len(calls) == 1
+
+
+def test_legacy_empty_receipt_requires_matching_original_selection(outbox):
+    original = record_empty_delivery(outbox)
+    state = digest.read_state(outbox)
+    state["sent_dates"][DAY].pop("job_count")
+    digest.write_state(outbox, state)
+    assert execute(outbox, correct_empty=True)["job_count"] == 10
+    assert (
+        digest.read_state(outbox)["sent_dates"][DAY]["digest_id"]
+        == original["digest_id"]
+    )
+
+
+def test_correction_cannot_replace_nonempty_or_unproven_history(outbox):
+    execute(outbox)
+    with pytest.raises(ValueError, match="already contained jobs"):
+        execute(
+            outbox,
+            correct_empty=True,
+            send=lambda *args: pytest.fail("unapproved replacement"),
+        )
+    state = digest.read_state(outbox)
+    state["sent_dates"][DAY].pop("job_count")
+    digest.write_state(outbox, state)
+    selection = json.loads((outbox / "selection.json").read_text())
+    selection["digest_id"] = "different"
+    (outbox / "selection.json").write_text(json.dumps(selection))
+    with pytest.raises(ValueError, match="matching evidence"):
+        execute(
+            outbox, correct_empty=True, send=lambda *args: pytest.fail("missing proof")
+        )
+
+
+def test_uncertain_correction_resumes_on_normal_scheduled_run(outbox):
+    record_empty_delivery(outbox)
+    calls = []
+
+    def uncertain(key, payload, idempotency_key):
+        calls.append((payload, idempotency_key))
+        raise RuntimeError("uncertain correction")
+
+    with pytest.raises(RuntimeError, match="uncertain correction"):
+        execute(outbox, correct_empty=True, send=uncertain)
+    assert digest.read_state(outbox)["pending"]["edition"] == "correction"
+
+    def retry(key, payload, idempotency_key):
+        assert (payload, idempotency_key) == calls[0]
+        return MESSAGE_ID
+
+    execute(outbox, now=NOW + timedelta(hours=1), send=retry)
+    assert digest.read_state(outbox)["corrections"][DAY]["job_count"] == 10
+
+
+def test_a_later_day_still_includes_open_roles_after_all_were_emailed(outbox):
+    original = update()
+    state = digest.read_state(outbox)
+    state["sent_job_ids"] = [row["posting_id"] for row in original["rows"]]
+    digest.write_state(outbox, state)
+    captured = []
+
+    def send(key, payload, idempotency_key):
+        captured.append(payload)
+        return MESSAGE_ID
+
+    assert execute(outbox, send=send)["job_count"] == 10
+    assert captured[0]["html"].count("Previously emailed · Still open") == 10
+    assert "No qualifying matches" not in captured[0]["text"]

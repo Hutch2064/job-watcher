@@ -90,7 +90,7 @@ def test_email_has_direct_links_plain_alternative_and_escaped_source_text():
         and 'href="https://example.com/jobs/1"' in html
     )
     assert "View role &amp; apply" in html
-    assert "No new qualifying" in digest.email_content([], DAY, status()["run_time"])[1]
+    assert "No qualifying" in digest.email_content([], DAY, status()["run_time"])[1]
 
 
 def test_prepare_does_not_mark_sent_and_uncertain_sends_are_blocked(tmp_path):
@@ -256,18 +256,20 @@ def test_claim_rechecks_location_policy_before_email_is_sent(tmp_path):
     assert digest.read_state(tmp_path)["pending"]["status"] == "reserved"
 
 
-def test_top_five_limit_keeps_score_order_and_filters_without_padding():
+def test_top_ten_limit_keeps_score_order_and_filters_without_padding():
     rows = [
         job(
             posting_id=f"a:{index}",
             title=f"Portfolio Construction Analyst {index}",
             url=f"https://example.com/jobs/{index}",
         )
-        for index in range(8)
+        for index in range(13)
     ]
     selected = digest.select_jobs(rows, status(), sent_ids=["a:0"])
-    assert len(selected) == 5
-    assert [row["posting_id"] for row in selected] == [f"a:{i}" for i in range(1, 6)]
+    assert len(selected) == 10
+    assert [row["posting_id"] for row in selected] == sorted(
+        f"a:{i}" for i in range(1, 13)
+    )[:10]
     assert len(digest.select_jobs(rows[:3], status(), sent_ids=["a:0"])) == 2
     assert not digest.select_jobs([job(location="London, UK")], status())
 
@@ -275,15 +277,20 @@ def test_top_five_limit_keeps_score_order_and_filters_without_padding():
 @pytest.mark.parametrize(
     "count,word",
     [
-        (0, "No new"),
+        (0, "No qualifying"),
         (1, "One role"),
         (2, "Two roles"),
         (3, "Three roles"),
         (4, "Four roles"),
         (5, "Five roles"),
+        (6, "Six roles"),
+        (7, "Seven roles"),
+        (8, "Eight roles"),
+        (9, "Nine roles"),
+        (10, "Ten roles"),
     ],
 )
-def test_email_heading_handles_zero_through_five_roles(count, word):
+def test_email_heading_handles_zero_through_ten_roles(count, word):
     rows = [
         digest.rank_job(job(posting_id=f"a:{index}"), DAY) for index in range(count)
     ]
@@ -291,3 +298,80 @@ def test_email_heading_handles_zero_through_five_roles(count, word):
     assert word in html
     assert word.lower() in plain
     assert html.count("View role &amp; apply") == count
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "Analyst/Associate, Research (Fixed Income)",
+        "Internship in Portfolio Management (Undergraduate & Master's)",
+        "Internship in Investment/Strategy Research (Undergraduate & Master's)",
+        "Internship in Investment Engineering (Undergraduate & Master's)",
+        "Internship in Investment Solutions (Undergraduate & Master's)",
+        "Associate Portfolio Advisor",
+        "Y Analytics, Responsible Investing, Summer Research Assistant, Internship",
+        "Analyst, Investment Risk",
+    ],
+)
+def test_real_title_variants_are_ranked_without_relaxing_experience_or_location(title):
+    assert digest.rank_job(job(title=title), DAY) is not None
+    assert digest.rank_job(job(title=title, location="New York, NY"), DAY) is None
+    assert digest.rank_job(job(title=title, experience="experienced"), DAY) is None
+    assert digest.rank_job(job(title=title, experience="unknown"), DAY) is None
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "Senior Portfolio Analyst",
+        "International Tax Analyst",
+        "MBA Summer Investment Research Associate",
+        "Software Engineer Intern",
+        "Insurance Risk Analyst",
+        "Marketing Research Analyst",
+    ],
+)
+def test_broader_title_matching_keeps_irrelevant_and_senior_roles_out(title):
+    assert digest.rank_job(job(title=title, duty_excerpt=""), DAY) is None
+
+
+def test_daily_shortlist_can_include_previously_emailed_roles_with_honest_labels(
+    tmp_path,
+):
+    digest.write_state(
+        tmp_path, {"sent_dates": {}, "sent_job_ids": ["a:1"], "pending": None}
+    )
+    update = {
+        "status": status(),
+        "rows": [job()],
+        "commit": "abc",
+        "workflow_run_id": 123,
+    }
+    prepared = digest.prepare(tmp_path, "recipient@example.com", update)
+    assert prepared["job_count"] == 1
+    selection = json.loads((tmp_path / "selection.json").read_text())
+    assert selection["jobs"][0]["previously_sent"] is True
+    delivery = json.loads((tmp_path / "delivery.json").read_text())
+    for part in delivery["payload"]["parts"]:
+        assert "Previously emailed" in part["body"]["content"]
+        assert "Still open" in part["body"]["content"]
+    # The same-day limit remains independent of repeat eligibility.
+    digest.confirm(tmp_path, prepared["digest_id"], "provider-id")
+    assert digest.prepare(tmp_path, "recipient@example.com", update)["action"] == "skip"
+
+
+def test_new_roles_break_equal_score_ties_without_displacing_stronger_matches():
+    rows = [
+        job(),
+        job(
+            posting_id="a:2",
+            title="Portfolio Construction Analyst II",
+            url="https://example.com/2",
+        ),
+        job(posting_id="a:3", title="Investment Analyst", url="https://example.com/3"),
+    ]
+    selected = digest.select_jobs(
+        rows, status(), sent_ids=["a:1"], include_previous=True
+    )
+    assert [row["posting_id"] for row in selected] == ["a:2", "a:1", "a:3"]
+    assert selected[1]["previously_sent"]

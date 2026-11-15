@@ -1,7 +1,7 @@
 # Personal daily shortlist
 
 After a successful **Daily job watch** update, GitHub Actions emails up to
-**five** unseen early-career investment roles directly through Resend. Each
+**ten** current early-career investment roles directly through Resend. Each
 role includes an employer application link, location, experience evidence,
 short duties excerpt and explainable score. The professional template provides
 both HTML and plain-text alternatives.
@@ -21,8 +21,10 @@ formatting, sending and receipt handling without an AI runtime.
 
 Only open roles with an early-career signal qualify. The threshold is 65/100.
 Senior roles, MBA/PhD-specific title tracks, stale observations, inactive
-sources, invalid application links and previously emailed posting IDs are
-excluded. Closely duplicated titles and application URLs appear once.
+sources and invalid application links are excluded. Closely duplicated titles
+and application URLs appear once. Title punctuation and word order are normalized
+so roles such as Research (Fixed Income), Investment/Strategy Research and
+Portfolio Management internships are recognized.
 
 Every role must be **remote or offer a Texas location**. Multi-location
 postings qualify when Texas is one option. Exact city-only labels for Austin,
@@ -32,9 +34,16 @@ another state or country, hybrids outside Texas and unclear locations are
 excluded. Generic remote listings are accepted with a reminder to confirm
 the employer's location restrictions.
 
-The digest sends fewer than five when fewer qualify. With no unseen qualifying
-roles, it sends a brief no-match update. Scores rank discovery fit; employers
-determine applicant eligibility. Browse retains the full geographic watchlist.
+The digest ranks the best current matches and sends up to ten. Previously
+emailed jobs remain eligible while open and are labeled **Previously emailed ·
+Still open**; other jobs are labeled **New to your digest**. New matches break
+equal-score ties, preserving career fit as the main ranking priority. This
+prevents an empty digest just because all suitable roles appeared before.
+
+It sends fewer than ten when fewer qualify. A no-match update means there are
+no current qualifying roles, including previously emailed ones. Scores rank
+discovery fit; employers determine applicant eligibility. Browse retains the
+full geographic watchlist.
 
 ## Cloud delivery
 
@@ -56,7 +65,16 @@ than 36 hours.
 
 One digest is allowed per UTC **data-update date**, including when the backup
 collection succeeds the same day. Existing sent dates and posting IDs were
-migrated from the previous sender, preserving duplicate protection.
+migrated from the previous sender, preserving duplicate protection and the
+ability to identify previously emailed jobs. Daily receipts now also record
+the number of jobs and their posting IDs.
+
+An explicit `correct_empty_digest` workflow input permits one clearly marked
+correction after a proven empty digest. It preserves the original receipt,
+records the correction separately and uses a distinct stable idempotency key.
+It refuses to replace a nonempty or unproven digest. Scheduled runs never
+request a correction automatically; they can safely resume an already-reserved
+correction after a transient failure.
 
 ## Private configuration and receipts
 
@@ -96,6 +114,10 @@ gh workflow run digest.yml -f dry_run=true -f verify_provider=true
 # Run the worker normally; already-delivered UTC dates are skipped.
 gh workflow run digest.yml
 
+# Replace a proven empty digest once, after reviewing the dry-run result.
+gh workflow run digest.yml -f dry_run=true -f correct_empty_digest=true
+gh workflow run digest.yml -f correct_empty_digest=true
+
 # Run ranking, geography, template, persistence and delivery-recovery tests.
 python3 -m pytest -q
 ```
@@ -105,7 +127,8 @@ local preparation and receipt commands for maintenance. `cloud_digest.py`
 handles direct provider delivery and the private outbox. No model or connected
 Gmail tool participates in scheduled delivery.
 
-Tests cover the five-role cap, score ordering, geography, prior deliveries,
+Tests cover the ten-role cap, real title variations, score ordering, geography,
+previously emailed still-open roles, one-time corrections,
 MIME alternatives, required state persistence, uncertain outcomes, identical
 idempotent retries and expired retry refusal. CI also checks the email layout
 at desktop and mobile widths. Provider simulation uses Resend's documented
